@@ -41,7 +41,7 @@ class EvidenceCitation(TypedDict):
 
 class AgentFinding(TypedDict):
     """The conclusion reached by one agent in the pipeline."""
-    agent: Literal["coverage", "risk_fraud", "decision_drafter"]
+    agent: Literal["document_intake", "coverage", "risk_fraud", "decision_drafter"]
     finding: str
     """What this agent concluded in plain language."""
     confidence: Literal["high", "medium", "low"]
@@ -75,16 +75,24 @@ class CMSClaimRecord(TypedDict):
     claim_id: str
     policy_id: str
     incident_date: str                      # ISO 8601: YYYY-MM-DD
+    incident_type: str
     incident_description: str
     vehicle_vin: str
-    claimant_id: str
-    damage_estimate_usd: float
-    repair_history: list[str]               # list of prior repair IDs
+    vehicle_year: int
+    vehicle_make: str
+    vehicle_model: str
+    vehicle_acv_usd: float                  # actual cash value at inception
+    repair_estimate_usd: float
+    damage_description: str
+    injuries_reported: bool
+    police_report_filed: bool
+    assigned_adjuster: str                  # adjuster username, e.g. "alice"
+    prior_claims_12mo: int                  # number of prior claims in last 12 months
+    fraud_risk_score: float                 # vendor score 0.0–1.0; treated as input, not decision
     claim_status: Literal[
-        "open", "under_review", "pending_decision", "closed"
+        "Approved", "Under Investigation", "Escalated", "Pending Review"
     ]
-    prior_claims_same_vin: list[str]        # list of prior claim IDs for VIN
-    prior_claims_same_claimant: list[str]   # list of prior claim IDs for claimant
+    prior_claims_same_vin: list[str]        # list of prior claim IDs for this VIN
     total_loss_flag: bool                   # true if VIN has a prior total-loss settlement
 
 
@@ -106,8 +114,9 @@ class CMSDecisionWriteRequest(TypedDict):
     """Plain-language summary of why this verdict was reached. Max 500 chars.
     Shown in the adjuster UI — written for a human reader, not a machine."""
     reasoning_chain: list[AgentFinding]
-    """Structured per-agent findings in pipeline order: coverage → risk_fraud
-    → decision_drafter. Stored for audit, compliance, and regulator requests.
+    """Structured per-agent findings in pipeline order: document_intake →
+    coverage → risk_fraud → decision_drafter. Stored for audit, compliance,
+    and regulator requests.
     Allows reconstruction of exactly what each agent found and what evidence
     it relied on, independently of the rolled-up summary."""
     citations: list[EvidenceCitation]
@@ -171,17 +180,33 @@ class PASCoverageItem(TypedDict):
 class PASPolicyRecord(TypedDict):
     """Returned by GET /policies/{policy_id}."""
     policy_id: str
-    named_insured_id: str
-    covered_vins: list[str]
+    holder_first: str
+    holder_last: str
+    """Holder name is available here for identity verification only.
+    It is stripped from the dossier before any model call — the model
+    never receives the policyholder's name (ADR-007, DEC-005)."""
+    vehicle_vin: str
+    vehicle_year: int
+    vehicle_make: str
+    vehicle_model: str
+    vehicle_acv_usd: float
+    coverage_type: Literal["Full Coverage", "Liability Only"]
+    """Top-level coverage class. Liability Only means no collision or
+    comprehensive cover — a first-party claim is a deterministic deny (ADR-006)."""
+    collision_coverage: bool
+    comprehensive_coverage: bool
+    collision_deductible_usd: Optional[float]      # None for Liability Only
+    comprehensive_deductible_usd: Optional[float]  # None for Liability Only
+    liability_limit: str                           # e.g. "300000/100000"
+    medpay_limit_usd: Optional[float]
+    policy_status: Literal["Active", "Expired", "Cancelled"]
     policy_period_start: str               # ISO 8601: YYYY-MM-DD
     policy_period_end: str                 # ISO 8601: YYYY-MM-DD
-    premium_payment_status: Literal["current", "lapsed", "cancelled"]
-    coverages: list[PASCoverageItem]
-    endorsements: list[str]                # endorsement identifiers
     clause_text: str
-    """Full policy clause text as a single string. Passed verbatim to the
-    Coverage Agent for reading and citation. The model cites clause
-    identifiers from this text; it does not paraphrase from memory."""
+    """Full policy clause text from the AutoSure policy manual
+    (clauses CLS-COLL-001 through CLS-PAY-012). Passed verbatim to
+    the Coverage agent for reading and citation. The model cites clause
+    identifiers from this text; it never paraphrases from memory."""
 
 
 # ---------------------------------------------------------------------------
@@ -205,15 +230,22 @@ class ClaimDocument(TypedDict):
     document_id: str
     claim_id: str
     document_type: Literal[
-        "police_report",
-        "repair_estimate",
-        "medical_record",
-        "witness_statement",
-        "photograph",
-        "prior_correspondence",
+        "FNOL_FORM",
+        "POLICE_REPORT",
+        "REPAIR_ESTIMATE",
+        "MEDICAL_REPORT",
+        "WITNESS_STATEMENT",
+        "DAMAGE_PHOTOS",
+        "RENTAL_RECEIPT",
     ]
+    description: str
+    ocr_status: Literal["Completed", "Pending"]
+    """Pending means the document has not yet been OCR-processed.
+    The pipeline must surface which documents are pending to the adjuster
+    and note that coverage assessment is incomplete until they clear."""
     content_text: str
-    """Extracted text content. Used by the Risk Agent; never used to
+    """Extracted text content from OCR. Empty string when ocr_status is
+    Pending. Used by Document Intake and Coverage agents; never used to
     override deterministic checks."""
     uploaded_at: str                        # ISO 8601 datetime
 
@@ -234,20 +266,21 @@ class DocStorePolicySearchRequest(TypedDict):
 
 class PolicyClauseChunk(TypedDict):
     clause_id: str
-    """Stable identifier for this clause chunk. Must be cited in any
-    coverage output that relies on this chunk."""
+    """Stable identifier for this clause chunk (e.g. CLS-COLL-001).
+    Must be cited in any coverage output that relies on this chunk.
+    A coverage statement without a retrieved clause ID is rejected
+    by the output validator."""
     clause_text: str
-    relevance_score: float                  # cosine similarity, 0.0–1.0
+    relevance_score: float                  # BM25 score, higher = more relevant
 
 
 class DocStorePolicySearchResponse(TypedDict):
     """Returned by POST /search."""
     query_text: str
     results: list[PolicyClauseChunk]
-    embedding_model_version: str
-    """Version of the embedding model used to build the index.
-    A version change invalidates the existing index and requires
-    a full re-index before search results are trusted."""
+    retrieval_method: str
+    """Retrieval method in use. 'bm25-lexical' for the pilot (12 clauses);
+    upgrade path to vector search documented in ADR-003."""
 
 
 # ---------------------------------------------------------------------------

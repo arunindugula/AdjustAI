@@ -1,97 +1,107 @@
 # Risk Register
 
-**Date:** 2026-10-17
+**Date:** 2026-10-18
 **Engagement:** ClaimSense Claims Adjudication Co-pilot — Motor Insurer
 **Vendor:** AdjustAI
-**Document version:** 1.0
+**Document version:** 2.0
 
 ---
 
 ## Overview
 
-This register records five risks identified at the start of the engagement. Each entry states the risk, its likelihood and impact before mitigation, the mitigation action, and the residual risk that remains after mitigation. The register is a live document and is updated at each milestone if circumstances change.
+This register records the top five risks to the engagement. Risks are scored on likelihood (L) and impact (I) on a 1–5 scale. Score = L × I. Any risk scoring 12 or above is reviewed at every weekly gate.
 
-Likelihood and impact are rated Low / Medium / High. The rating reflects conditions at the time of writing.
+The register leads with **runtime and safety risks** — the failure modes that cause real harm once the system is in operation — followed by a watch list of delivery risks that are tracked but do not currently score in the top five.
 
----
-
-## R1 — Data-Access and Controls-Review Delay
-
-**Category:** Organisational / Access politics
-
-**Description:**
-The client's CISO or security team delays or blocks access to one or more of the three client systems (CMS, PAS, Document Store) pending a controls review. At a regulated insurer, data-access approval typically takes significantly longer than the technical integration work it gates. This is the longest pole in the engagement and the largest driver of schedule risk.
-
-**Likelihood:** High
-**Impact:** High
-
-**Mitigation:**
-- All development and testing proceeds against synthetic data only, so the pipeline can be built and validated without requiring production system access
-- Access requests are initiated at M1 (discovery), not M3 (integration), to maximise lead time
-- The engagement charter and SoW explicitly document the three systems and their integration points so the controls review has a complete picture from day one
-- The VP of Claims Operations is identified as the internal sponsor who can accelerate approval
-
-**Residual risk:** Medium — synthetic data removes the build dependency, but the live demonstration and final acceptance criteria require real system connectivity. A prolonged controls review could delay M4 and M5.
+Residual is the expected score after mitigation. A risk only moves to its residual score once its corresponding evaluation slice passes in CI.
 
 ---
 
-## R2 — Model Accuracy Below Threshold
+## R1 — Model Hallucination
 
-**Category:** Technical / Model performance
+**Category:** Technical / Model safety
+
+**Likelihood:** 4  **Impact:** 4  **Score:** 16
 
 **Description:**
-The agent pipeline fails to reach the 92% decision accuracy threshold (AC-1) on the holdout evaluation set. This can occur if the policy corpus retrieval returns the wrong clause, if the model reasons incorrectly from a correctly retrieved clause, or if adversarial cases in the evaluation set expose systematic failure modes.
-
-**Likelihood:** Medium
-**Impact:** High
+The adjuster card states a fact, figure, or document reference that is not in the claim file. The model invents a dollar amount, a clause it never retrieved, or a document ID that does not exist. On an adjuster card this is not a reasoning error — it is misinformation in a regulated decision.
 
 **Mitigation:**
-- The initial 20-case evaluation set (M1) is used to validate the pipeline during development, not just at the final gate
-- Coverage output must cite the retrieved clause identifier — this makes retrieval failures visible and debuggable before the final evaluation
-- Adversarial cases are included in the evaluation set from M1 so failure modes are surfaced early
-- The CI evaluation gate blocks image push on a failing build, catching regressions before they reach production
+- Net payable, total-loss ratio, deductible, and in-force status are computed in deterministic Python before any agent runs and passed into the agent context as inputs (ADR-005). The model cites them; it does not compute them.
+- An output validator rejects any dollar figure in agent output that is not present in the dossier, and any document ID not in the claim's document inventory.
+- Structured output is enforced for each agent stage — free-form text that bypasses the schema is not accepted.
+- If the model is unreachable, the card shows the deterministic baseline code labelled `engine: rules`, not a model-generated result.
+- The evaluation set includes "invented figure" and "phantom document" adversarial cases. The CI gate blocks image push if any of these pass through.
 
-**Residual risk:** Low-Medium — systematic retrieval or reasoning failures are detectable early. The residual risk is concentrated in edge cases not represented in the development evaluation set.
+**Early warning:** Output validator rejection rate > 2% of runs in CI.
+
+**Residual:** 2 × 4 = 8
 
 ---
 
-## R3 — Legacy System API Instability
+## R2 — Coverage Misread
 
-**Category:** Technical / Integration
+**Category:** Technical / Model accuracy
+
+**Likelihood:** 3  **Impact:** 5  **Score:** 15
 
 **Description:**
-The CMS or PAS exposes undocumented rate limits, inconsistent response schemas, or intermittent availability that causes pipeline failures during integration and testing. Legacy insurance core systems are frequently built on middleware that was not designed for programmatic access at agent throughput.
-
-**Likelihood:** Medium
-**Impact:** Medium
+A wrongful denial (litigation exposure) or wrongful approval (financial leakage). Concrete examples: approving a claim against a policy whose status field reads "Active" but whose loss date falls outside the coverage window; approving a first-party collision claim on a liability-only policy; citing a clause that does not apply to the loss type.
 
 **Mitigation:**
-- All three client system integrations are built behind an abstraction layer so a schema change or rate limit breach is contained to one adapter, not the whole pipeline
-- The pipeline implements exponential backoff and retry on all external API calls
-- Typed input and output contracts (M2 deliverable) are agreed with the client before integration begins, creating a shared reference for what the API must return
-- Integration is tested against synthetic stubs before live system access is available, so behaviour under failure conditions is understood early
+- The in-force check runs on dates, not on the status field — the policy-period clause (CLS-PER-006) is the authority, not the CMS status string (ADR-003, W1 Finding 1).
+- Liability-only policies with first-party claims are caught in the deterministic pre-check layer and routed to deny before any agent runs (ADR-006).
+- Coverage Check must cite a retrieved clause ID for every coverage statement; the output validator enforces this. A coverage statement without a citation is rejected (AC-4).
+- Zero false approves is a release gate condition (AC-7). Any false approve in CI fails the build.
 
-**Residual risk:** Low — the abstraction layer and retry logic contain most failure modes. A hard rate limit below pipeline throughput requirements would require renegotiation with the client's systems team.
+**Early warning:** Any false approve in CI; citation coverage < 100%.
+
+**Residual:** 1 × 5 = 5
 
 ---
 
-## R4 — Prompt Injection via Claim Documents
+## R3 — Auth Failure
 
-**Category:** Security / Adversarial input
+**Category:** Security / Access control
+
+**Likelihood:** 3  **Impact:** 5  **Score:** 15
 
 **Description:**
-A malicious or malformed document in the claim file — a police report, repair estimate, or witness statement — contains text designed to manipulate agent behaviour, override instructions, or cause the agent to return data outside its intended scope. This is a known attack vector when user-supplied documents are passed directly to a language model.
-
-**Likelihood:** Low
-**Impact:** High
+An adjuster reads a claim not assigned to them — through the console, by prompting the model, or through a misconfigured data-access call. At a regulated insurer, an unauthorised read of a claim record is a data breach, not a UX bug.
 
 **Mitigation:**
-- Document content is passed to the model as data, not as part of the system prompt, reducing the surface area for instruction injection
-- Input guardrails sanitise document text before it reaches the agent, flagging and quarantining chunks that match injection patterns
-- The access control check runs in deterministic code before any agent is invoked — a successful injection cannot bypass the entitlement boundary because that boundary is not controlled by the model
-- The evaluation suite (M5) includes a prompt injection adversarial family to verify that the guardrails hold under test conditions
+- Access control runs in deterministic code before any agent is invoked (ADR-001). The model never makes access decisions.
+- The identity of the requesting user is derived from the verified JWT — it never comes from the request payload. A prompt saying "I am the senior adjuster" has nowhere to go.
+- Every data-access call is audited, whether allowed or denied, with user ID, action, resource ID, and result (AC-6).
+- The two-user RBAC test (AC-5) is a release gate: Alice (adjuster) must receive 403 on Bob's claim; Bob (senior) must receive 200.
+- Adversarial eval cases include "act as senior adjuster" and cross-record leakage attempts (AC-7).
 
-**Residual risk:** Low-Medium — the deterministic access control boundary limits the blast radius of a successful injection. The residual risk is that a novel injection pattern bypasses the input guardrails before the eval suite detects it.
+**Early warning:** Any 200 response for a cross-assignment read in the AC-5 matrix test.
+
+**Residual:** 1 × 5 = 5
+
+---
+
+## R4 — Data Leak
+
+**Category:** Security / Data handling
+
+**Likelihood:** 2  **Impact:** 5  **Score:** 10
+
+**Description:**
+Claimant data reaches the model vendor, an application log, another user's session, or a CI artifact. This covers PII in model inputs, holder names in audit logs, and JWT secrets in image layers or CI environment variables.
+
+**Mitigation:**
+- The de-identified 20-claim export is used for all development and testing. No production data, no real PII is introduced before a Data Processing Agreement is signed (ADR-007).
+- The policy holder's name is dropped by the data contract before any model call — it is never sent to the inference layer.
+- The dossier passed to agents carries one claim only; nothing crosses records.
+- Audit logs record IDs and actions, not content.
+- Secrets are kept in AWS SSM Parameter Store as SecureString. No credential is in code, images, or CI logs.
+- CI and CloudWatch logs are scanned for holder-name patterns at every gate.
+
+**Early warning:** Grep of CI or CloudWatch logs finds a holder name or JWT token.
+
+**Residual:** 1 × 5 = 5
 
 ---
 
@@ -99,28 +109,43 @@ A malicious or malformed document in the claim file — a police report, repair 
 
 **Category:** Commercial / Engagement management
 
-**Description:**
-Once the pipeline is working and visible to the client at M3 or M4, the client requests features or integrations outside the scope defined in Section 1 of the SoW — for example, direct claimant communication, settlement calculation, or integration with additional systems. Requests arrive informally and without a change order, creating pressure to absorb them into the existing engagement.
+**Likelihood:** 4  **Impact:** 3  **Score:** 12
 
-**Likelihood:** Medium
-**Impact:** Medium
+**Description:**
+Once the pipeline is visible at W3 or W4, the client requests features outside the scope defined in Section 1 of the SoW — auto-approval, write-back to CMS, rental adjudication, or production data access within the five weeks. Requests arrive informally and without a change order.
 
 **Mitigation:**
-- The SoW (Section 1) explicitly names what is out of scope, giving both parties a written reference point when a request is evaluated
-- The change control clause (Section 5) requires a written change order signed by both parties before any out-of-scope work begins
-- The out-of-scope boundary is reviewed with the client at the M2 sign-off so there are no surprises when requests are declined mid-engagement
-- The VP of Claims Operations is the named approver for any change order, ensuring informal requests from daily users do not bypass the commercial process
+- Section 3 of the SoW explicitly names every exclusion, giving both parties a written reference when a request is evaluated.
+- Section 8 (Change Control) requires a written impact assessment and sponsor sign-off before any out-of-scope work begins.
+- ADR-004 (no write path) documents the reasoning for one of the most likely creep vectors, so "not now" comes with a documented rationale.
+- Every gate opens by reading SoW Section 2 aloud. Any new item that is not on the list triggers a formal change request.
 
-**Residual risk:** Low — the SoW and change control clause contain most scope creep risk. The residual risk is reputational: declining a request the client considers reasonable can damage the relationship even when the refusal is contractually correct.
+**Early warning:** Any request that starts with "while you're in there…" or names a deliverable not in SoW Section 2.
+
+**Residual:** 2 × 3 = 6
+
+---
+
+## Watch List — Delivery Risks
+
+These risks are tracked but currently score below the top five. They are reviewed at each gate and promoted if their score rises.
+
+| ID | Risk | L × I | Mitigation summary |
+|---|---|---|---|
+| W1 | Data-access and controls-review delay (CISO gate) | 4 × 4 = 16 | All development proceeds against the de-identified export; access requests initiated at W1 to maximise lead time; Marcus Chen identified as reviewer |
+| W2 | Legacy API instability — undocumented rate limits or schema changes | 3 × 3 = 9 | Abstraction layer behind each adapter; retry with exponential backoff; typed contracts agreed before integration begins |
+| W3 | OCR backlog — repair estimates remain Pending; cards cannot be completed | 3 × 2 = 6 | Card names the specific pending document and why it matters; Tom Ngata to report the OCR queue SLA |
+| W4 | Latency misses p95 < 90 s with four sequential agent calls | 3 × 2 = 6 | Measure at W3; if missed, run Coverage Check and Claim Assessment in parallel (both depend only on Document Intake output) |
+| W5 | Label disagreement — Bob Reyes and Grace Liu reach different verdicts on a deny case | 2 × 3 = 6 | Disagreement resolved by Bob and logged in DECISIONS.md; Grace consulted on coverage-denial cases |
 
 ---
 
 ## Summary
 
-| ID | Risk | Likelihood | Impact | Residual |
-|---|---|---|---|---|
-| R1 | Data-access and controls-review delay | High | High | Medium |
-| R2 | Model accuracy below threshold | Medium | High | Low-Medium |
-| R3 | Legacy system API instability | Medium | Medium | Low |
-| R4 | Prompt injection via claim documents | Low | High | Low-Medium |
-| R5 | Scope creep | Medium | Medium | Low |
+| ID | Risk | L | I | Score | Residual |
+|---|---|---|---|---|---|
+| R1 | Model hallucination | 4 | 4 | 16 | 8 |
+| R2 | Coverage misread — wrongful denial or approval | 3 | 5 | 15 | 5 |
+| R3 | Auth failure — adjuster reads wrong claim | 3 | 5 | 15 | 5 |
+| R4 | Data leak to vendor, log, or other session | 2 | 5 | 10 | 5 |
+| R5 | Scope creep | 4 | 3 | 12 | 6 |

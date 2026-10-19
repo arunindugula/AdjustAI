@@ -164,22 +164,22 @@ figcaption {
 </style>
 
 <div class="page">
-  <div class="eyebrow">ClaimSense — Milestone 2</div>
+  <div class="eyebrow">ClaimSense — Milestone 2 · v2</div>
   <h1>System Architecture Diagram</h1>
-  <p class="subtitle">Every data flow labelled. The boundary between deterministic code and model judgment is marked explicitly.</p>
+  <p class="subtitle">Four-agent pipeline. MCP layer is the single authenticated data-access path. Deterministic code owns all arithmetic and access decisions.</p>
 
   <div class="card">
     <figure>
       <!--
-        Grid: 820 × 660
-        Col 1 (client systems): x 10–145
-        Col 2 (deterministic):  x 160–420   background rect
-        Col 3 (model judgment): x 440–810   background rect
-        Bottom row (adjuster):  y 510–575
+        ViewBox: 820 × 720
+        Col 1 (client systems): x 8–155
+        Col 2 (deterministic / MCP): x 157–430
+        Col 3 (model judgment):  x 442–812
+        Bottom row (adjuster):  y 590–658
       -->
-      <svg viewBox="0 0 820 620"
+      <svg viewBox="0 0 820 720"
            role="img"
-           aria-label="ClaimSense architecture: adjuster request enters the deterministic access-control gate, which reads from CMS, PAS and Document Store and runs policy-period validation, monetary calculations and VIN deduplication before passing structured data to the model judgment layer. The model layer runs Coverage Agent, Risk/Fraud Agent and Decision Drafter with RAG over the policy corpus. Output goes to the licensed adjuster UI; confirmed decisions are written back to the CMS.">
+           aria-label="ClaimSense architecture: adjuster request enters the MCP layer which verifies the JWT, checks RBAC, and audits every call. Deterministic pre-checks compute net payable, policy-period validity, coverage type, and VIN deduplication. Four agents run in sequence: Document Intake, Coverage Check, Claim Assessment, Decision Draft. BM25 search over the 12-clause policy corpus grounds every coverage statement. Output goes to the licensed adjuster UI; confirmed decisions are written back to the CMS.">
         <defs>
           <marker id="ah"      markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="var(--arrow)"/></marker>
           <marker id="ah-det"  markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3z" fill="var(--det-soft)"/></marker>
@@ -191,213 +191,220 @@ figcaption {
         <!-- ── ZONE BACKGROUNDS ─────────────────────────── -->
 
         <!-- Client systems zone -->
-        <rect x="8" y="130" width="138" height="285" rx="8"
+        <rect x="8" y="148" width="138" height="290" rx="8"
               fill="var(--sys-zone)" stroke="var(--sys-border)" stroke-width="1.5" stroke-dasharray="5,3"/>
 
         <!-- Deterministic zone -->
-        <rect x="157" y="14" width="268" height="530" rx="10"
+        <rect x="157" y="14" width="278" height="595" rx="10"
               fill="var(--det-zone)" stroke="var(--det-border)" stroke-width="1.5"/>
 
         <!-- Model judgment zone -->
-        <rect x="442" y="14" width="370" height="440" rx="10"
+        <rect x="447" y="14" width="365" height="540" rx="10"
               fill="var(--model-zone)" stroke="var(--model-border)" stroke-width="1.5"/>
 
         <!-- ── ZONE LABELS ──────────────────────────────── -->
 
-        <text x="18" y="148" font-family="Inter,sans-serif" font-size="8.5" font-weight="700" letter-spacing=".06em" fill="var(--sys-ink)">CLIENT SYSTEMS</text>
+        <text x="18" y="166" font-family="Inter,sans-serif" font-size="8.5" font-weight="700" letter-spacing=".06em" fill="var(--sys-ink)">CLIENT SYSTEMS</text>
 
-        <text x="291" y="33" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" letter-spacing=".07em" fill="var(--det-ink)">DETERMINISTIC CODE</text>
-        <text x="291" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)" opacity=".65">never delegated to a model</text>
+        <text x="296" y="33" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" letter-spacing=".07em" fill="var(--det-ink)">DETERMINISTIC CODE</text>
+        <text x="296" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)" opacity=".65">access · auth · audit · arithmetic</text>
 
-        <text x="627" y="33" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" letter-spacing=".07em" fill="var(--model-ink)">MODEL JUDGMENT</text>
-        <text x="627" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".65">every judgment is cited</text>
+        <text x="629" y="33" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" letter-spacing=".07em" fill="var(--model-ink)">MODEL JUDGMENT</text>
+        <text x="629" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".65">four agents · every judgment is cited</text>
 
         <!-- ── ENTRY ARROW ──────────────────────────────── -->
 
-        <text x="291" y="10" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--fg)">Adjuster submits claim ID</text>
-        <line x1="291" y1="12" x2="291" y2="53" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="296" y="10" text-anchor="middle" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--fg)">Adjuster submits claim ID + JWT</text>
+        <line x1="296" y1="12" x2="296" y2="53" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
 
         <!-- ── CLIENT SYSTEM BOXES ─────────────────────── -->
 
-        <rect x="16" y="165" width="122" height="52" rx="5"
+        <rect x="16" y="182" width="122" height="52" rx="5"
               fill="var(--card)" stroke="var(--sys-soft)" stroke-width="1.5"/>
-        <text x="77" y="186" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">CMS</text>
-        <text x="77" y="201" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">Claims Management</text>
-        <text x="77" y="213" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read · write (confirmed only)</text>
+        <text x="77" y="203" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">CMS</text>
+        <text x="77" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">Claims Management</text>
+        <text x="77" y="229" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read · write (confirmed only)</text>
 
-        <rect x="16" y="243" width="122" height="52" rx="5"
+        <rect x="16" y="261" width="122" height="52" rx="5"
               fill="var(--card)" stroke="var(--sys-soft)" stroke-width="1.5"/>
-        <text x="77" y="264" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">PAS</text>
-        <text x="77" y="279" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">Policy Administration</text>
-        <text x="77" y="291" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read-only</text>
+        <text x="77" y="282" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">PAS</text>
+        <text x="77" y="297" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">Policy Administration</text>
+        <text x="77" y="308" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read-only</text>
 
-        <rect x="16" y="321" width="122" height="52" rx="5"
+        <rect x="16" y="340" width="122" height="52" rx="5"
               fill="var(--card)" stroke="var(--sys-soft)" stroke-width="1.5"/>
-        <text x="77" y="342" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">Doc Store</text>
-        <text x="77" y="357" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">claims docs · policy corpus</text>
-        <text x="77" y="369" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read-only</text>
+        <text x="77" y="361" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="700" fill="var(--sys-ink)">Doc Store</text>
+        <text x="77" y="376" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">claims docs · policy corpus</text>
+        <text x="77" y="387" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-soft)">read-only</text>
 
-        <!-- ── DETERMINISTIC BOXES ─────────────────────── -->
+        <!-- ── MCP LAYER BOX ───────────────────────────── -->
 
-        <!-- Access Control Gate -->
-        <rect x="168" y="57" width="246" height="88" rx="6"
-              fill="var(--det-box)" stroke="var(--det-soft)" stroke-width="1.5"/>
-        <text x="291" y="78" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--det-ink)">Access Control Gate</text>
-        <text x="291" y="95" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">runs before any agent is invoked</text>
-        <text x="291" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">checks entitlement store · short-lived service token</text>
-        <text x="291" y="125" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)" opacity=".75">entitled? → proceed   not entitled? → refusal + audit, no data returned</text>
+        <rect x="168" y="57" width="256" height="100" rx="6"
+              fill="var(--det-box)" stroke="var(--det-soft)" stroke-width="2"/>
+        <text x="296" y="78" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--det-ink)">MCP Layer</text>
+        <text x="296" y="94" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">JWT verified · RBAC enforced · every call audited</text>
+        <text x="296" y="109" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">single authenticated data-access path for all agents</text>
+        <text x="296" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)" opacity=".75">identity comes from token · model never sees user or group</text>
+        <text x="296" y="137" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)" opacity=".65">entitled → proceed · not entitled → 403 + audit · no data returned</text>
 
         <!-- Denied path annotation -->
-        <line x1="395" y1="62" x2="430" y2="42" stroke="var(--denied)" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#ah-deny)"/>
-        <text x="432" y="40" font-family="Inter,sans-serif" font-size="8.5" font-weight="600" fill="var(--denied)">denied →</text>
-        <text x="432" y="52" font-family="Inter,sans-serif" font-size="8" fill="var(--denied)">refusal returned</text>
-        <text x="432" y="63" font-family="Inter,sans-serif" font-size="8" fill="var(--denied)">no claim data · audit record written</text>
+        <line x1="416" y1="65" x2="442" y2="50" stroke="var(--denied)" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#ah-deny)"/>
+        <text x="444" y="48" font-family="Inter,sans-serif" font-size="8.5" font-weight="600" fill="var(--denied)">403 denied →</text>
+        <text x="444" y="60" font-family="Inter,sans-serif" font-size="8" fill="var(--denied)">no data returned · audit record written</text>
 
-        <!-- Arrow: Access Control → Pre-checks (granted) -->
-        <line x1="291" y1="145" x2="291" y2="195" stroke="var(--det-soft)" stroke-width="1.5" marker-end="url(#ah-det)"/>
-        <text x="296" y="175" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)">granted</text>
+        <!-- Arrow: MCP → Pre-checks (granted) -->
+        <line x1="296" y1="157" x2="296" y2="207" stroke="var(--det-soft)" stroke-width="1.5" marker-end="url(#ah-det)"/>
+        <text x="301" y="186" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)">granted</text>
 
-        <!-- Deterministic Pre-checks -->
-        <rect x="168" y="200" width="246" height="155" rx="6"
+        <!-- ── DETERMINISTIC PRE-CHECKS ─────────────────── -->
+
+        <rect x="168" y="212" width="256" height="170" rx="6"
               fill="var(--det-box)" stroke="var(--det-soft)" stroke-width="1.5"/>
-        <text x="291" y="222" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="var(--det-ink)">Deterministic Pre-checks</text>
+        <text x="296" y="233" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="var(--det-ink)">Deterministic Pre-checks</text>
 
-        <text x="182" y="243" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">Policy-period validation</text>
-        <text x="182" y="257" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">loss date vs. coverage window — code, not model</text>
+        <text x="182" y="254" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">Coverage-type check</text>
+        <text x="182" y="268" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">liability-only + first-party claim → deny (no agent invoked)</text>
 
-        <text x="182" y="276" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">Monetary calculations</text>
-        <text x="182" y="290" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">repair-to-value ratio · coverage limit arithmetic</text>
+        <text x="182" y="288" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">Policy-period validation</text>
+        <text x="182" y="302" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">loss date vs. coverage window — dates, not status field</text>
 
-        <text x="182" y="309" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">VIN / total-loss deduplication</text>
-        <text x="182" y="323" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">prior settlement check on same VIN</text>
+        <text x="182" y="322" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">Monetary calculations</text>
+        <text x="182" y="336" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">net payable · TL ratio · deductible — code, never model output</text>
 
-        <text x="182" y="342" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)" opacity=".7">→ outputs structured claim + policy data</text>
+        <text x="182" y="356" font-family="Inter,sans-serif" font-size="10.5" font-weight="600" fill="var(--det-ink)">VIN / total-loss deduplication</text>
+        <text x="182" y="370" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">prior settlement check on same VIN → SIU route</text>
 
-        <!-- Audit Trail box (dashed, inside det zone) -->
-        <rect x="168" y="395" width="246" height="58" rx="5"
+        <text x="182" y="374" font-family="Inter,sans-serif" font-size="9" fill="var(--det-ink)" opacity=".7">→ structured dossier passed to agents</text>
+
+        <!-- Audit Trail box -->
+        <rect x="168" y="475" width="256" height="64" rx="5"
               fill="var(--card)" stroke="var(--audit-ink)" stroke-width="1.2" stroke-dasharray="5,3"/>
-        <text x="291" y="419" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="var(--audit-ink)">Audit Trail</text>
-        <text x="291" y="435" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">every call — user · action · resource · outcome</text>
-        <text x="291" y="448" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">granted and denied · append-only</text>
+        <text x="296" y="500" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="var(--audit-ink)">Audit Trail — CloudWatch Logs</text>
+        <text x="296" y="516" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">every MCP call · user id · action · resource · result</text>
+        <text x="296" y="529" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">granted and denied · append-only · 90-day retention</text>
 
-        <!-- Arrow: pre-checks → audit (writes to audit on every call) -->
-        <line x1="291" y1="355" x2="291" y2="393" stroke="var(--audit-ink)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah)"/>
-        <text x="295" y="377" font-family="Inter,sans-serif" font-size="8" fill="var(--audit-ink)">records call</text>
+        <!-- Arrow: pre-checks → audit -->
+        <line x1="296" y1="382" x2="296" y2="473" stroke="var(--audit-ink)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah)"/>
+        <text x="300" y="432" font-family="Inter,sans-serif" font-size="8" fill="var(--audit-ink)">records every call</text>
 
-        <!-- ── CROSS-ZONE ARROWS (systems → det) ────────── -->
+        <!-- ── CROSS-ZONE ARROWS (systems → MCP) ────────── -->
 
-        <!-- CMS → Access Control -->
-        <line x1="138" y1="184" x2="166" y2="100" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
-        <text x="118" y="158" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">claim data</text>
-        <text x="118" y="170" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">history</text>
+        <line x1="138" y1="200" x2="166" y2="115" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="110" y="173" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">claim data</text>
 
-        <!-- PAS → Pre-checks -->
-        <line x1="138" y1="268" x2="166" y2="268" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
-        <text x="141" y="262" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">policy terms</text>
-        <text x="141" y="274" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">dates · limits</text>
+        <line x1="138" y1="285" x2="166" y2="285" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="139" y="278" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">policy terms</text>
 
-        <!-- DocStore → Pre-checks -->
-        <line x1="138" y1="345" x2="166" y2="316" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
-        <text x="138" y="338" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">documents</text>
+        <line x1="138" y1="362" x2="166" y2="335" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="135" y="356" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">documents</text>
 
-        <!-- ── CROSS-ZONE ARROWS (det → model) ─────────── -->
+        <!-- ── CROSS-ZONE ARROWS (det → agents) ─────────── -->
 
-        <!-- Pre-checks → Coverage Agent -->
-        <line x1="414" y1="252" x2="440" y2="115" stroke="var(--det-soft)" stroke-width="1.5" marker-end="url(#ah-det)"/>
+        <!-- Pre-checks → Document Intake -->
+        <line x1="424" y1="265" x2="445" y2="105" stroke="var(--det-soft)" stroke-width="1.5" marker-end="url(#ah-det)"/>
+        <text x="427" y="210" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)">dossier</text>
+        <text x="427" y="222" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)">(claim + policy</text>
+        <text x="427" y="234" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)">+ documents)</text>
 
-        <!-- Pre-checks → Risk Agent -->
-        <line x1="414" y1="285" x2="440" y2="210" stroke="var(--det-soft)" stroke-width="1.5" marker-end="url(#ah-det)"/>
-
-        <!-- Label on the two arrows above -->
-        <text x="418" y="196" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)">claim + policy</text>
-        <text x="418" y="208" font-family="Inter,sans-serif" font-size="8.5" fill="var(--det-ink)">+ documents</text>
-
-        <!-- DocStore → RAG (policy corpus indexed) -->
-        <path d="M138,356 C280,500 360,510 440,420" fill="none"
+        <!-- DocStore → RAG corpus -->
+        <path d="M138,370 C280,560 370,575 447,520" fill="none"
               stroke="var(--arrow)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ah)"/>
-        <text x="255" y="502" font-family="Inter,sans-serif" font-size="8" fill="var(--muted)">policy corpus indexed into RAG</text>
+        <text x="245" y="565" font-family="Inter,sans-serif" font-size="8" fill="var(--muted)">policy corpus → BM25 index (12 clauses)</text>
 
-        <!-- ── MODEL ZONE BOXES ────────────────────────── -->
+        <!-- ── FOUR AGENTS ─────────────────────────────── -->
 
-        <!-- Coverage Agent -->
-        <rect x="453" y="58" width="348" height="72" rx="6"
+        <!-- Document Intake -->
+        <rect x="458" y="58" width="348" height="72" rx="6"
               fill="var(--model-box)" stroke="var(--model-soft)" stroke-width="1.5"/>
-        <text x="627" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Coverage Agent</text>
-        <text x="627" y="97" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">reads policy clause text · cites retrieved clause ID</text>
-        <text x="627" y="112" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">does the policy wording respond to this loss?</text>
-        <text x="627" y="124" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">output always names the clause identifier retrieved — never memory</text>
+        <text x="632" y="79" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Document Intake</text>
+        <text x="632" y="96" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">reads and normalises all claim documents from the dossier</text>
+        <text x="632" y="111" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">surfaces pending OCR · flags missing documents to adjuster</text>
+        <text x="632" y="123" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">structured document summary → Coverage Check</text>
 
-        <!-- Coverage → Risk arrow -->
-        <line x1="627" y1="130" x2="627" y2="153" stroke="var(--model-soft)" stroke-width="1" marker-end="url(#ah-mod)"/>
+        <!-- Document Intake → Coverage Check -->
+        <line x1="632" y1="130" x2="632" y2="153" stroke="var(--model-soft)" stroke-width="1" marker-end="url(#ah-mod)"/>
 
-        <!-- Risk / Fraud Agent -->
-        <rect x="453" y="158" width="348" height="72" rx="6"
+        <!-- Coverage Check -->
+        <rect x="458" y="158" width="348" height="72" rx="6"
               fill="var(--model-box)" stroke="var(--model-soft)" stroke-width="1.5"/>
-        <text x="627" y="180" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Risk / Fraud Agent</text>
-        <text x="627" y="197" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">reads narrative across all documents · cites sources</text>
-        <text x="627" y="212" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">is the narrative consistent? flag or route to SIU?</text>
-        <text x="627" y="224" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">every finding names the document it came from</text>
+        <text x="632" y="179" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Coverage Check</text>
+        <text x="632" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">applies policy manual to the loss type via BM25 retrieval</text>
+        <text x="632" y="211" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">cites retrieved clause ID — never paraphrases from memory</text>
+        <text x="632" y="223" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">output validator enforces citation — uncited statement is rejected</text>
 
-        <!-- Risk → Decision Drafter arrow -->
-        <line x1="627" y1="230" x2="627" y2="253" stroke="var(--model-soft)" stroke-width="1" marker-end="url(#ah-mod)"/>
+        <!-- Coverage Check → Claim Assessment -->
+        <line x1="632" y1="230" x2="632" y2="253" stroke="var(--model-soft)" stroke-width="1" marker-end="url(#ah-mod)"/>
 
-        <!-- Decision Drafter -->
-        <rect x="453" y="258" width="348" height="72" rx="6"
+        <!-- Claim Assessment -->
+        <rect x="458" y="258" width="348" height="72" rx="6"
               fill="var(--model-box)" stroke="var(--model-soft)" stroke-width="1.5"/>
-        <text x="627" y="280" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Decision Drafter</text>
-        <text x="627" y="297" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">approve · flag for review · route to SIU · deny</text>
-        <text x="627" y="312" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">outputs verdict + reasoning summary + evidence citations</text>
-        <text x="627" y="324" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">model-generated verdicts distinguishable from deterministic fallback</text>
+        <text x="632" y="279" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Claim Assessment</text>
+        <text x="632" y="296" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">reads narrative across all documents · cites document IDs</text>
+        <text x="632" y="311" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">consistent narrative? flag for review or route to SIU?</text>
+        <text x="632" y="323" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">fraud risk score treated as input, not decision</text>
 
-        <!-- RAG box -->
-        <rect x="453" y="365" width="348" height="68" rx="5"
+        <!-- Claim Assessment → Decision Draft -->
+        <line x1="632" y1="330" x2="632" y2="353" stroke="var(--model-soft)" stroke-width="1" marker-end="url(#ah-mod)"/>
+
+        <!-- Decision Draft -->
+        <rect x="458" y="358" width="348" height="72" rx="6"
+              fill="var(--model-box)" stroke="var(--model-soft)" stroke-width="1.5"/>
+        <text x="632" y="379" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="700" fill="var(--model-ink)">Decision Draft</text>
+        <text x="632" y="396" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">approve · flag for review · route to SIU · deny</text>
+        <text x="632" y="411" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">outputs verdict + reasoning summary + consolidated citations</text>
+        <text x="632" y="423" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">model_generated: true distinguishes from deterministic fallback</text>
+
+        <!-- BM25 / RAG box -->
+        <rect x="458" y="455" width="348" height="72" rx="5"
               fill="var(--card)" stroke="var(--model-soft)" stroke-width="1.2" stroke-dasharray="5,3"/>
-        <text x="627" y="388" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="600" fill="var(--model-ink)">RAG — Policy Corpus</text>
-        <text x="627" y="404" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">vector search over policy clause corpus</text>
-        <text x="627" y="419" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">every coverage output cites the clause identifier actually retrieved</text>
-        <text x="627" y="430" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">the model never paraphrases policy from memory</text>
+        <text x="632" y="477" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" font-weight="600" fill="var(--model-ink)">BM25 — Policy Corpus (12 clauses)</text>
+        <text x="632" y="493" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">lexical search over CLS-COLL-001 through CLS-PAY-012</text>
+        <text x="632" y="508" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="var(--muted)">every coverage output cites the retrieved clause identifier</text>
+        <text x="632" y="520" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)" opacity=".7">vector search upgrade path documented in ADR-003</text>
 
-        <!-- Coverage Agent → RAG (queries) -->
-        <path d="M801,110 C815,110 820,398 803,398" fill="none"
+        <!-- Coverage Check → BM25 (queries) -->
+        <path d="M806" y1="200" C820,200 820,490 808,490" fill="none"
+              stroke="var(--model-soft)" stroke-width="1" stroke-dasharray="4,3"/>
+        <path d="M806,194 C826,194 826,491 806,491" fill="none"
               stroke="var(--model-soft)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ah-mod)"/>
-        <text x="812" y="270" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)">queries</text>
+        <text x="813" y="355" font-family="Inter,sans-serif" font-size="8.5" fill="var(--model-ink)">queries</text>
 
         <!-- ── OUTPUT FLOW ──────────────────────────────── -->
 
-        <!-- Decision Drafter → Adjuster UI -->
-        <line x1="627" y1="330" x2="627" y2="478" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
-        <text x="633" y="410" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">verdict + reasoning</text>
-        <text x="633" y="422" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">+ citations</text>
+        <!-- Decision Draft → Adjuster UI -->
+        <line x1="632" y1="430" x2="632" y2="588" stroke="var(--arrow)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="638" y="516" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">verdict + reasoning</text>
+        <text x="638" y="528" font-family="Inter,sans-serif" font-size="8.5" fill="var(--muted)">+ citations</text>
 
         <!-- Adjuster UI box -->
-        <rect x="157" y="480" width="665" height="68" rx="8"
+        <rect x="157" y="590" width="665" height="68" rx="8"
               fill="var(--card)" stroke="var(--border)" stroke-width="2"/>
-        <text x="489" y="505" text-anchor="middle" font-family="Inter,sans-serif" font-size="13.5" font-weight="700" fill="var(--fg)">Licensed Adjuster</text>
-        <text x="489" y="522" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="var(--muted)">confirms or rejects every recommendation · accountable for every outcome</text>
-        <text x="489" y="538" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">the system recommends · the adjuster decides · no decision is final without confirmation</text>
+        <text x="489" y="614" text-anchor="middle" font-family="Inter,sans-serif" font-size="13.5" font-weight="700" fill="var(--fg)">Licensed Adjuster (Bob Reyes)</text>
+        <text x="489" y="631" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="var(--muted)">confirms or rejects every recommendation · legally accountable for every outcome</text>
+        <text x="489" y="647" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" fill="var(--muted)">the system recommends · the adjuster decides · CLS-PAY-012: no payment without adjuster confirmation</text>
 
-        <!-- Adjuster UI → CMS write-back -->
-        <path d="M157,514 C80,514 60,191 138,191" fill="none"
+        <!-- Adjuster → CMS write-back -->
+        <path d="M157,624 C80,624 60,210 138,210" fill="none"
               stroke="var(--sys-soft)" stroke-width="1.5" marker-end="url(#ah-sys)"/>
-        <text x="44" y="430" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-ink)" transform="rotate(-90 44 430)">writes: verdict + reasoning + citations</text>
-        <text x="32" y="430" font-family="Inter,sans-serif" font-size="8" fill="var(--sys-ink)" opacity=".7" transform="rotate(-90 32 430)">(post-confirmation · one record · idempotent)</text>
+        <text x="44" y="450" font-family="Inter,sans-serif" font-size="8.5" fill="var(--sys-ink)" transform="rotate(-90 44 450)">verdict + reasoning + citations (post-confirmation)</text>
+        <text x="32" y="450" font-family="Inter,sans-serif" font-size="8" fill="var(--sys-ink)" opacity=".7" transform="rotate(-90 32 450)">idempotent · SHA-256 key</text>
 
-        <!-- Adjuster UI → Audit trail -->
-        <line x1="291" y1="480" x2="291" y2="455" stroke="var(--audit-ink)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah)"/>
-        <text x="295" y="470" font-family="Inter,sans-serif" font-size="8" fill="var(--audit-ink)">confirmation recorded</text>
+        <!-- Adjuster → Audit trail -->
+        <line x1="296" y1="590" x2="296" y2="541" stroke="var(--audit-ink)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ah)"/>
+        <text x="300" y="568" font-family="Inter,sans-serif" font-size="8" fill="var(--audit-ink)">confirmation recorded</text>
 
       </svg>
 
       <figcaption>
-        <strong>Blue zone — Deterministic code:</strong> Access control runs first in code before any agent receives data. Policy-period validation (is the loss date inside the coverage window?), monetary calculations, and VIN deduplication are computed deterministically and cannot be overridden by model output. A denied request returns no claim data; the refusal is written to the audit trail. <br>
-        <strong>Amber zone — Model judgment:</strong> Agents receive the structured output of the deterministic layer. Every judgment names the evidence it relied on — the Coverage Agent cites the retrieved clause identifier; the Risk Agent cites the document it read. The Decision Drafter's verdict is distinguishable from any deterministic fallback output. RAG grounds coverage output in retrieved clause text, never model memory. <br>
-        <strong>Write-back:</strong> The co-pilot writes one structured record to the CMS — verdict, reasoning summary, evidence citations — only after the licensed adjuster confirms. The write operation is idempotent.
+        <strong>Blue zone — Deterministic code:</strong> The MCP layer is the single authenticated data-access path for all agents. It verifies the JWT, enforces RBAC (access decided before any agent sees data), and audits every call — allowed or denied. Deterministic pre-checks compute net payable, total-loss ratio, coverage-type eligibility, and VIN deduplication. None of these can be overridden by model output.<br>
+        <strong>Amber zone — Four agents in sequence:</strong> Document Intake normalises raw documents. Coverage Check retrieves and cites the relevant clause from the 12-clause AutoSure policy manual (BM25). Claim Assessment reads narrative consistency across documents. Decision Draft produces the verdict, reasoning summary, and consolidated citations. The fraud risk score is an input to Claim Assessment — it is not a decision. BM25 lexical search is the retrieval method for the pilot; upgrade path to vector search is documented in ADR-003.<br>
+        <strong>Write-back:</strong> One idempotent record written to the CMS post-confirmation. CLS-PAY-012 is the governing clause: no payment without a licensed adjuster's written confirmation.
       </figcaption>
     </figure>
 
     <div class="legend">
-      <div class="legend-item"><div class="swatch det"></div>Deterministic code</div>
-      <div class="legend-item"><div class="swatch model"></div>Model judgment</div>
+      <div class="legend-item"><div class="swatch det"></div>Deterministic code (MCP · auth · arithmetic)</div>
+      <div class="legend-item"><div class="swatch model"></div>Model judgment (4 agents · BM25)</div>
       <div class="legend-item"><div class="swatch sys"></div>Client systems</div>
       <div class="legend-item"><div class="swatch audit"></div>Audit trail</div>
     </div>

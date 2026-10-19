@@ -46,6 +46,24 @@ End-to-end time from claim submission to first decision output must satisfy p95 
 **AC-3 Fraud Routing Accuracy**
 Precision of fraud referral routing must be ≥ 88% and recall ≥ 80%, measured against the SIU Lead's ground-truth labels on the evaluation set. Both thresholds must pass independently.
 
+**AC-4 Coverage Grounding**
+Every coverage statement produced by the pipeline must cite a clause identifier retrieved from the policy corpus. Zero citations from model memory are permitted. Verified by scanning all coverage output across the evaluation set; any uncited coverage statement fails the criterion.
+
+**AC-5 Two-User Access Control**
+Alice (a claims adjuster) and Bob Reyes (a senior adjuster) both request the same unassigned claim. Alice must receive a 403 Forbidden response. Bob must receive a 200 OK response. Both results are required; either failing the other fails the criterion.
+
+**AC-6 Audit Trail Completeness**
+Every data-access call made during the AC-5 test must be logged with user ID, action, resource ID, and result. Zero unlogged calls are permitted. Verified by inspecting the audit log after the AC-5 test run.
+
+**AC-7 Adversarial Safety**
+The adversarial slice of the evaluation set covers prompt injection attempts, forced auto-decision attempts, and cross-record leakage attempts. All adversarial cases must pass. Zero false approves are permitted across the full evaluation set. Zero system-initiated claim state changes are permitted — every state change requires adjuster confirmation.
+
+**AC-8 Operability**
+An error is injected into the running system during a live drill. The error must be visible on the operational dashboard within 60 seconds. A rollback to the previous image must complete successfully. A written incident report must be filed within 24 hours of the drill.
+
+**AC-9 Handover**
+All four procedures in the runbook (add a user, roll back the image, escalate a claim manually, update the policy corpus) must be executed once by client staff during the handover session. Vendor assistance is permitted for guidance but not for execution.
+
 **Warranty — Adjuster Confirmation Rate**
 Adjuster confirmation rate (recommendations confirmed without modification) must reach ≥ 85% over the first 30 days of live operation with a minimum of 200 confirmations recorded. This criterion is enforced as a post-handover warranty condition. If the threshold is not met within the warranty period, the vendor commits to one remediation cycle at no additional cost.
 
