@@ -1,0 +1,75 @@
+document_id,claim_id,document_type,description,upload_date,page_count,ocr_status,uploaded_by
+DOC-00001,CLM-2024-1800,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-14,2,Completed,alice
+DOC-00002,CLM-2024-1800,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-14,2,Completed,alice
+DOC-00003,CLM-2024-1873,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-22,2,Completed,carol
+DOC-00004,CLM-2024-1873,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-01-26,1,Completed,carol
+DOC-00005,CLM-2024-1873,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-22,1,Completed,carol
+DOC-00006,CLM-2024-1873,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-01-22,4,Completed,carol
+DOC-00007,CLM-2024-1873,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-01-25,2,Pending,carol
+DOC-00008,CLM-2024-1946,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-20,2,Completed,eve
+DOC-00009,CLM-2024-1946,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-02-21,5,Completed,eve
+DOC-00010,CLM-2024-1946,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-22,1,Completed,eve
+DOC-00011,CLM-2024-1946,POLICE_REPORT,Police incident report or HPD reference number,2024-02-24,3,Completed,eve
+DOC-00012,CLM-2024-2019,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-23,2,Completed,david
+DOC-00013,CLM-2024-2019,POLICE_REPORT,Police incident report or HPD reference number,2024-02-23,3,Completed,david
+DOC-00014,CLM-2024-2019,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-02-25,1,Completed,david
+DOC-00015,CLM-2024-2019,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-23,1,Completed,david
+DOC-00016,CLM-2024-2019,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-02-24,1,Pending,david
+DOC-00017,CLM-2024-2092,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-13,2,Completed,alice
+DOC-00018,CLM-2024-2092,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-17,2,Pending,alice
+DOC-00019,CLM-2024-2092,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-02-15,4,Completed,alice
+DOC-00020,CLM-2024-2092,POLICE_REPORT,Police incident report or HPD reference number,2024-02-17,5,Completed,alice
+DOC-00021,CLM-2024-2092,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-02-13,1,Completed,alice
+DOC-00022,CLM-2024-2165,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-05,2,Completed,alice
+DOC-00023,CLM-2024-2165,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-09,2,Completed,alice
+DOC-00024,CLM-2024-2165,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-02-09,1,Completed,alice
+DOC-00025,CLM-2024-2238,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-24,2,Completed,david
+DOC-00026,CLM-2024-2238,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-01-25,6,Completed,david
+DOC-00027,CLM-2024-2238,WITNESS_STATEMENT,Written statement from third-party witness,2024-01-26,1,Completed,david
+DOC-00028,CLM-2024-2238,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-26,1,Completed,david
+DOC-00029,CLM-2024-2311,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-07,2,Completed,david
+DOC-00030,CLM-2024-2311,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-02-10,3,Completed,david
+DOC-00031,CLM-2024-2311,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-02-09,1,Completed,david
+DOC-00032,CLM-2024-2311,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-02-07,1,Completed,david
+DOC-00033,CLM-2024-2384,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-16,2,Completed,alice
+DOC-00034,CLM-2024-2384,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-02-17,1,Completed,alice
+DOC-00035,CLM-2024-2457,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-27,2,Completed,bob
+DOC-00036,CLM-2024-2457,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-01-28,5,Completed,bob
+DOC-00037,CLM-2024-2457,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-29,1,Completed,bob
+DOC-00038,CLM-2024-2457,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-01-30,3,Pending,bob
+DOC-00039,CLM-2024-2530,FNOL_FORM,First Notice of Loss — claimant intake form,2024-03-01,2,Completed,david
+DOC-00040,CLM-2024-2530,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-03-05,3,Completed,david
+DOC-00041,CLM-2024-2603,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-10,2,Completed,carol
+DOC-00042,CLM-2024-2603,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-10,1,Completed,carol
+DOC-00043,CLM-2024-2603,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-01-14,1,Completed,carol
+DOC-00044,CLM-2024-2676,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-23,2,Completed,bob
+DOC-00045,CLM-2024-2676,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-02-24,5,Completed,bob
+DOC-00046,CLM-2024-2676,POLICE_REPORT,Police incident report or HPD reference number,2024-02-24,5,Pending,bob
+DOC-00047,CLM-2024-2676,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-24,1,Completed,bob
+DOC-00048,CLM-2024-2676,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-02-26,2,Pending,bob
+DOC-00049,CLM-2024-2749,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-06,2,Completed,alice
+DOC-00050,CLM-2024-2749,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-02-08,1,Completed,alice
+DOC-00051,CLM-2024-2749,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-02-07,1,Pending,alice
+DOC-00052,CLM-2024-2749,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-02-07,1,Completed,alice
+DOC-00053,CLM-2024-2749,WITNESS_STATEMENT,Written statement from third-party witness,2024-02-08,2,Completed,alice
+DOC-00054,CLM-2024-2822,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-31,2,Completed,david
+DOC-00055,CLM-2024-2822,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-31,1,Completed,david
+DOC-00056,CLM-2024-2895,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-27,2,Completed,david
+DOC-00057,CLM-2024-2895,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-01-28,2,Completed,david
+DOC-00058,CLM-2024-2895,POLICE_REPORT,Police incident report or HPD reference number,2024-01-30,4,Pending,david
+DOC-00059,CLM-2024-2895,WITNESS_STATEMENT,Written statement from third-party witness,2024-01-29,2,Pending,david
+DOC-00060,CLM-2024-2895,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-01-28,1,Completed,david
+DOC-00061,CLM-2024-2968,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-19,2,Completed,carol
+DOC-00062,CLM-2024-2968,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-01-20,5,Completed,carol
+DOC-00063,CLM-2024-2968,WITNESS_STATEMENT,Written statement from third-party witness,2024-01-19,1,Pending,carol
+DOC-00064,CLM-2024-3041,FNOL_FORM,First Notice of Loss — claimant intake form,2024-02-27,2,Completed,alice
+DOC-00065,CLM-2024-3041,DAMAGE_PHOTOS,Photographs of vehicle damage — exterior and interior,2024-03-02,1,Completed,alice
+DOC-00066,CLM-2024-3041,REPAIR_ESTIMATE,Body shop repair estimate with parts and labour breakdown,2024-03-01,1,Completed,alice
+DOC-00067,CLM-2024-3114,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-31,2,Completed,bob
+DOC-00068,CLM-2024-3114,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-02-02,1,Completed,bob
+DOC-00069,CLM-2024-3187,FNOL_FORM,First Notice of Loss — claimant intake form,2024-01-16,2,Completed,eve
+DOC-00070,CLM-2024-3187,MEDICAL_REPORT,EMS or hospital discharge report for injury cases,2024-01-17,5,Completed,eve
+DOC-00071,CLM-2024-3187,RENTAL_RECEIPT,Rental vehicle receipt for reimbursement,2024-01-19,1,Completed,eve
+DOC-00072,CLM-2024-1800,POLICE_REPORT,Municipal police report for parking-lot collision,2024-02-15,3,Completed,alice
+DOC-00073,CLM-2024-1800,REPAIR_ESTIMATE,Licensed body shop estimate — rear bumper and trunk lid,2024-02-16,4,Completed,alice
+DOC-00074,CLM-2024-1800,DAMAGE_PHOTOS,Claimant photographs of rear-end damage,2024-02-14,8,Completed,alice

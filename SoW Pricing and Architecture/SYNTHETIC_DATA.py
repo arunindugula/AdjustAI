@@ -1,14 +1,13 @@
 """
 Synthetic Data Utilities — ClaimSense Co-pilot
 ===============================================
-The session_pack (session_pack/data/*.csv and session_pack/synthetic_documents/)
-provides the authoritative synthetic dataset for this engagement:
+The ClaimsData folder provides the authoritative synthetic dataset for this engagement:
 
-  session_pack/data/claimsense_claims.csv    — 20 claims
-  session_pack/data/claimsense_policies.csv  — 15 policies
-  session_pack/data/claimsense_documents.csv — 71 document records
-  session_pack/synthetic_documents/          — PDFs for all claims and policies
-  session_pack/synthetic_documents/AutoSure_Policy_Manual_CLS-001-012.pdf
+  ClaimsData/data/claimsense_claims.csv    — 20 claims
+  ClaimsData/data/claimsense_policies.csv  — 15 policies
+  ClaimsData/data/claimsense_documents.csv — 71 document records
+  ClaimsData/synthetic_documents/          — PDFs for all claims and policies
+  ClaimsData/synthetic_documents/AutoSure_Policy_Manual_CLS-001-012.pdf
 
 mock_api.py reads from these CSVs directly. This file retains only the
 utilities that mock_api.py still needs.
@@ -33,7 +32,7 @@ def _det_id(seed: str, prefix: str, length: int = 8) -> str:
 # ---------------------------------------------------------------------------
 # These are the 12 clauses the BM25 search index is built from.
 # Clause IDs match the AutoSure_Policy_Manual_CLS-001-012.pdf in
-# session_pack/synthetic_documents/.
+# ClaimsData/synthetic_documents/.
 # In M3 this text is replaced by direct PDF extraction from the manual.
 # ---------------------------------------------------------------------------
 

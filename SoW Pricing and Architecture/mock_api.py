@@ -66,7 +66,7 @@ app = FastAPI(
     version="2.0.0",
 )
 
-SESSION_PACK = Path(__file__).parent.parent / "session_pack" / "data"
+SESSION_PACK = Path(__file__).parent.parent / "ClaimsData" / "data"
 
 # ---------------------------------------------------------------------------
 # Load CSVs at startup

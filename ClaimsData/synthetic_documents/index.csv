@@ -1,0 +1,75 @@
+file,document_id,claim_id,document_type,pages_expected,pages_built,ocr_status,description
+claims/CLM-2024-1800/DOC-00001_FNOL_FORM.pdf,DOC-00001,CLM-2024-1800,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-1800/DOC-00002_WITNESS_STATEMENT.pdf,DOC-00002,CLM-2024-1800,WITNESS_STATEMENT,2,2,Completed,Written statement from third-party witness
+claims/CLM-2024-1873/DOC-00003_FNOL_FORM.pdf,DOC-00003,CLM-2024-1873,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-1873/DOC-00004_RENTAL_RECEIPT.pdf,DOC-00004,CLM-2024-1873,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-1873/DOC-00005_DAMAGE_PHOTOS.pdf,DOC-00005,CLM-2024-1873,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-1873/DOC-00006_MEDICAL_REPORT.pdf,DOC-00006,CLM-2024-1873,MEDICAL_REPORT,4,4,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-1873/DOC-00007_REPAIR_ESTIMATE.pdf,DOC-00007,CLM-2024-1873,REPAIR_ESTIMATE,2,2,Pending,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-1946/DOC-00008_FNOL_FORM.pdf,DOC-00008,CLM-2024-1946,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-1946/DOC-00009_MEDICAL_REPORT.pdf,DOC-00009,CLM-2024-1946,MEDICAL_REPORT,5,5,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-1946/DOC-00010_WITNESS_STATEMENT.pdf,DOC-00010,CLM-2024-1946,WITNESS_STATEMENT,1,1,Completed,Written statement from third-party witness
+claims/CLM-2024-1946/DOC-00011_POLICE_REPORT.pdf,DOC-00011,CLM-2024-1946,POLICE_REPORT,3,3,Completed,Police incident report or HPD reference number
+claims/CLM-2024-2019/DOC-00012_FNOL_FORM.pdf,DOC-00012,CLM-2024-2019,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2019/DOC-00013_POLICE_REPORT.pdf,DOC-00013,CLM-2024-2019,POLICE_REPORT,3,3,Completed,Police incident report or HPD reference number
+claims/CLM-2024-2019/DOC-00014_RENTAL_RECEIPT.pdf,DOC-00014,CLM-2024-2019,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-2019/DOC-00015_WITNESS_STATEMENT.pdf,DOC-00015,CLM-2024-2019,WITNESS_STATEMENT,1,1,Completed,Written statement from third-party witness
+claims/CLM-2024-2019/DOC-00016_DAMAGE_PHOTOS.pdf,DOC-00016,CLM-2024-2019,DAMAGE_PHOTOS,1,1,Pending,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2092/DOC-00017_FNOL_FORM.pdf,DOC-00017,CLM-2024-2092,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2092/DOC-00018_WITNESS_STATEMENT.pdf,DOC-00018,CLM-2024-2092,WITNESS_STATEMENT,2,2,Pending,Written statement from third-party witness
+claims/CLM-2024-2092/DOC-00019_MEDICAL_REPORT.pdf,DOC-00019,CLM-2024-2092,MEDICAL_REPORT,4,4,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2092/DOC-00020_POLICE_REPORT.pdf,DOC-00020,CLM-2024-2092,POLICE_REPORT,5,5,Completed,Police incident report or HPD reference number
+claims/CLM-2024-2092/DOC-00021_RENTAL_RECEIPT.pdf,DOC-00021,CLM-2024-2092,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-2165/DOC-00022_FNOL_FORM.pdf,DOC-00022,CLM-2024-2165,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2165/DOC-00023_WITNESS_STATEMENT.pdf,DOC-00023,CLM-2024-2165,WITNESS_STATEMENT,2,2,Completed,Written statement from third-party witness
+claims/CLM-2024-2165/DOC-00024_REPAIR_ESTIMATE.pdf,DOC-00024,CLM-2024-2165,REPAIR_ESTIMATE,1,1,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2238/DOC-00025_FNOL_FORM.pdf,DOC-00025,CLM-2024-2238,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2238/DOC-00026_MEDICAL_REPORT.pdf,DOC-00026,CLM-2024-2238,MEDICAL_REPORT,6,6,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2238/DOC-00027_WITNESS_STATEMENT.pdf,DOC-00027,CLM-2024-2238,WITNESS_STATEMENT,1,1,Completed,Written statement from third-party witness
+claims/CLM-2024-2238/DOC-00028_DAMAGE_PHOTOS.pdf,DOC-00028,CLM-2024-2238,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2311/DOC-00029_FNOL_FORM.pdf,DOC-00029,CLM-2024-2311,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2311/DOC-00030_MEDICAL_REPORT.pdf,DOC-00030,CLM-2024-2311,MEDICAL_REPORT,3,3,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2311/DOC-00031_RENTAL_RECEIPT.pdf,DOC-00031,CLM-2024-2311,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-2311/DOC-00032_REPAIR_ESTIMATE.pdf,DOC-00032,CLM-2024-2311,REPAIR_ESTIMATE,1,1,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2384/DOC-00033_FNOL_FORM.pdf,DOC-00033,CLM-2024-2384,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2384/DOC-00034_DAMAGE_PHOTOS.pdf,DOC-00034,CLM-2024-2384,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2457/DOC-00035_FNOL_FORM.pdf,DOC-00035,CLM-2024-2457,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2457/DOC-00036_MEDICAL_REPORT.pdf,DOC-00036,CLM-2024-2457,MEDICAL_REPORT,5,5,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2457/DOC-00037_DAMAGE_PHOTOS.pdf,DOC-00037,CLM-2024-2457,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2457/DOC-00038_REPAIR_ESTIMATE.pdf,DOC-00038,CLM-2024-2457,REPAIR_ESTIMATE,3,3,Pending,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2530/DOC-00039_FNOL_FORM.pdf,DOC-00039,CLM-2024-2530,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2530/DOC-00040_REPAIR_ESTIMATE.pdf,DOC-00040,CLM-2024-2530,REPAIR_ESTIMATE,3,3,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2603/DOC-00041_FNOL_FORM.pdf,DOC-00041,CLM-2024-2603,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2603/DOC-00042_DAMAGE_PHOTOS.pdf,DOC-00042,CLM-2024-2603,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2603/DOC-00043_REPAIR_ESTIMATE.pdf,DOC-00043,CLM-2024-2603,REPAIR_ESTIMATE,1,1,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2676/DOC-00044_FNOL_FORM.pdf,DOC-00044,CLM-2024-2676,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2676/DOC-00045_MEDICAL_REPORT.pdf,DOC-00045,CLM-2024-2676,MEDICAL_REPORT,5,5,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2676/DOC-00046_POLICE_REPORT.pdf,DOC-00046,CLM-2024-2676,POLICE_REPORT,5,5,Pending,Police incident report or HPD reference number
+claims/CLM-2024-2676/DOC-00047_WITNESS_STATEMENT.pdf,DOC-00047,CLM-2024-2676,WITNESS_STATEMENT,1,1,Completed,Written statement from third-party witness
+claims/CLM-2024-2676/DOC-00048_REPAIR_ESTIMATE.pdf,DOC-00048,CLM-2024-2676,REPAIR_ESTIMATE,2,2,Pending,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2749/DOC-00049_FNOL_FORM.pdf,DOC-00049,CLM-2024-2749,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2749/DOC-00050_REPAIR_ESTIMATE.pdf,DOC-00050,CLM-2024-2749,REPAIR_ESTIMATE,1,1,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2749/DOC-00051_DAMAGE_PHOTOS.pdf,DOC-00051,CLM-2024-2749,DAMAGE_PHOTOS,1,1,Pending,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2749/DOC-00052_RENTAL_RECEIPT.pdf,DOC-00052,CLM-2024-2749,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-2749/DOC-00053_WITNESS_STATEMENT.pdf,DOC-00053,CLM-2024-2749,WITNESS_STATEMENT,2,2,Completed,Written statement from third-party witness
+claims/CLM-2024-2822/DOC-00054_FNOL_FORM.pdf,DOC-00054,CLM-2024-2822,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2822/DOC-00055_DAMAGE_PHOTOS.pdf,DOC-00055,CLM-2024-2822,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2895/DOC-00056_FNOL_FORM.pdf,DOC-00056,CLM-2024-2895,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2895/DOC-00057_REPAIR_ESTIMATE.pdf,DOC-00057,CLM-2024-2895,REPAIR_ESTIMATE,2,2,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-2895/DOC-00058_POLICE_REPORT.pdf,DOC-00058,CLM-2024-2895,POLICE_REPORT,4,4,Pending,Police incident report or HPD reference number
+claims/CLM-2024-2895/DOC-00059_WITNESS_STATEMENT.pdf,DOC-00059,CLM-2024-2895,WITNESS_STATEMENT,2,2,Pending,Written statement from third-party witness
+claims/CLM-2024-2895/DOC-00060_DAMAGE_PHOTOS.pdf,DOC-00060,CLM-2024-2895,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-2968/DOC-00061_FNOL_FORM.pdf,DOC-00061,CLM-2024-2968,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-2968/DOC-00062_MEDICAL_REPORT.pdf,DOC-00062,CLM-2024-2968,MEDICAL_REPORT,5,5,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-2968/DOC-00063_WITNESS_STATEMENT.pdf,DOC-00063,CLM-2024-2968,WITNESS_STATEMENT,1,1,Pending,Written statement from third-party witness
+claims/CLM-2024-3041/DOC-00064_FNOL_FORM.pdf,DOC-00064,CLM-2024-3041,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-3041/DOC-00065_DAMAGE_PHOTOS.pdf,DOC-00065,CLM-2024-3041,DAMAGE_PHOTOS,1,1,Completed,Photographs of vehicle damage — exterior and interior
+claims/CLM-2024-3041/DOC-00066_REPAIR_ESTIMATE.pdf,DOC-00066,CLM-2024-3041,REPAIR_ESTIMATE,1,1,Completed,Body shop repair estimate with parts and labour breakdown
+claims/CLM-2024-3114/DOC-00067_FNOL_FORM.pdf,DOC-00067,CLM-2024-3114,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-3114/DOC-00068_RENTAL_RECEIPT.pdf,DOC-00068,CLM-2024-3114,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-3187/DOC-00069_FNOL_FORM.pdf,DOC-00069,CLM-2024-3187,FNOL_FORM,2,2,Completed,First Notice of Loss — claimant intake form
+claims/CLM-2024-3187/DOC-00070_MEDICAL_REPORT.pdf,DOC-00070,CLM-2024-3187,MEDICAL_REPORT,5,5,Completed,EMS or hospital discharge report for injury cases
+claims/CLM-2024-3187/DOC-00071_RENTAL_RECEIPT.pdf,DOC-00071,CLM-2024-3187,RENTAL_RECEIPT,1,1,Completed,Rental vehicle receipt for reimbursement
+claims/CLM-2024-1800/DOC-00072_POLICE_REPORT.pdf,DOC-00072,CLM-2024-1800,POLICE_REPORT,3,3,Completed,Municipal police report for parking-lot collision
+claims/CLM-2024-1800/DOC-00073_REPAIR_ESTIMATE.pdf,DOC-00073,CLM-2024-1800,REPAIR_ESTIMATE,4,4,Completed,Licensed body shop estimate — rear bumper and trunk lid
+claims/CLM-2024-1800/DOC-00074_DAMAGE_PHOTOS.pdf,DOC-00074,CLM-2024-1800,DAMAGE_PHOTOS,8,8,Completed,Claimant photographs of rear-end damage
