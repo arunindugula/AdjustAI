@@ -167,7 +167,7 @@ Agent 4 — Decision Draft
 
 - [x] **Step 1** — `template.yaml` + `docker-compose.yml` (SAM + DynamoDB Local)
 - [x] **Step 2** — `src/seed/seed_dynamo.py` (CSVs → DynamoDB, idempotent)
-- [ ] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
+- [x] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
 - [ ] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
 - [ ] **Step 5** — `src/deterministic/checks.py` — pre-agent deterministic checks
 - [ ] **Step 6** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
