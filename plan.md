@@ -167,7 +167,7 @@ Agent 4 — Decision Draft
 ## Build Steps
 
 - [x] **Step 1** — `template.yaml` + `docker-compose.yml` (SAM + DynamoDB Local)
-- [ ] **Step 2** — `src/seed/seed_dynamo.py` (CSVs → DynamoDB, idempotent)
+- [x] **Step 2** — `src/seed/seed_dynamo.py` (CSVs → DynamoDB, idempotent)
 - [ ] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
 - [ ] **Step 4** — `src/retrieval/` — PDF extract + real BM25 index
 - [ ] **Step 5** — `src/deterministic/checks.py` — pre-agent deterministic checks
