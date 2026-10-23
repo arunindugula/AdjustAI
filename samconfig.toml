@@ -1,0 +1,51 @@
+# SAM deployment configuration — one section per environment.
+#
+# Usage:
+#   sam deploy --config-env dev       (or staging, prod)
+#   make deploy ENV=staging
+#
+# Each environment deploys as a separate CloudFormation stack in the same
+# AWS account. They share nothing — separate Lambda functions, separate
+# DynamoDB tables, separate Cognito pools, separate API Gateway URLs.
+#
+# Stack naming: claimsense-{env}
+# Table naming: claimsense-{table}-{env}   (enforced by !Sub in template.yaml)
+
+version = 0.1
+
+# ---------------------------------------------------------------------------
+# DEV — used by engineers for daily development and feature work
+# ---------------------------------------------------------------------------
+[dev.deploy.parameters]
+stack_name          = "claimsense-dev"
+region              = "us-east-1"
+confirm_changeset   = false          # deploy without asking for confirmation
+fail_on_empty_changeset = false      # don't error if nothing changed
+capabilities        = "CAPABILITY_IAM"
+parameter_overrides = "Stage=dev"
+s3_prefix           = "claimsense-dev"
+# s3_bucket is set on first deploy via `sam deploy --guided --config-env dev`
+
+# ---------------------------------------------------------------------------
+# STAGING — mirrors prod; used for final QA and client demos
+# ---------------------------------------------------------------------------
+[staging.deploy.parameters]
+stack_name          = "claimsense-staging"
+region              = "us-east-1"
+confirm_changeset   = true           # prompt before applying changes
+fail_on_empty_changeset = false
+capabilities        = "CAPABILITY_IAM"
+parameter_overrides = "Stage=staging"
+s3_prefix           = "claimsense-staging"
+
+# ---------------------------------------------------------------------------
+# PROD — live environment; requires explicit confirmation on every deploy
+# ---------------------------------------------------------------------------
+[prod.deploy.parameters]
+stack_name          = "claimsense-prod"
+region              = "us-east-1"
+confirm_changeset   = true           # always prompt in prod
+fail_on_empty_changeset = false
+capabilities        = "CAPABILITY_IAM"
+parameter_overrides = "Stage=prod"
+s3_prefix           = "claimsense-prod"
