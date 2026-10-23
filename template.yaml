@@ -22,6 +22,10 @@ Globals:
         DECISIONS_TABLE: !Ref DecisionsTable
         # Overridden in env.local.json for local dev (points to DynamoDB Local)
         DYNAMODB_ENDPOINT: ""
+        # Bedrock Knowledge Base ID — injected at deploy time
+        # Set manually in env.local.json for local dev (points at real Bedrock)
+        KNOWLEDGE_BASE_ID: !Ref PolicyKnowledgeBase
+        DOCS_BUCKET:       !Ref PolicyDocsBucket
 
 # ---------------------------------------------------------------------------
 # Parameters let you pass values at deploy time (e.g. different environments).
@@ -165,10 +169,12 @@ Resources:
   #
   # Two routes:
   #   GET  /documents/{claim_id}  → list all documents for a claim
-  #   POST /search                → BM25 search over policy corpus
+  #   POST /search                → Bedrock Knowledge Base retrieval
   #
   # The /search endpoint is what the Coverage Check agent calls.
-  # It must return cited clause IDs — never bare text without a clause ID.
+  # It queries the Bedrock Knowledge Base and returns relevant policy
+  # clause chunks. Every result includes a source location (clause ID)
+  # so the agent can cite it — never from model memory.
   # -------------------------------------------------------------------------
   DocStoreFunction:
     Type: AWS::Serverless::Function
@@ -176,10 +182,21 @@ Resources:
       FunctionName: !Sub claimsense-docstore-${Stage}
       CodeUri: src/api/docstore/
       Handler: handler.lambda_handler
-      Description: Document Store — claim documents and BM25 policy search
+      Description: Document Store — claim documents and Bedrock policy search
+      Timeout: 30
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref DocumentsTable
+        # Allow Lambda to call Bedrock Knowledge Base retrieve API
+        - Statement:
+            Effect: Allow
+            Action:
+              - bedrock:Retrieve
+              - bedrock:RetrieveAndGenerate
+            Resource: !GetAtt PolicyKnowledgeBase.KnowledgeBaseArn
+        # Allow Lambda to read policy PDFs from S3 (for future doc serving)
+        - S3ReadPolicy:
+            BucketName: !Ref PolicyDocsBucket
       Events:
         GetDocuments:
           Type: Api
@@ -256,6 +273,124 @@ Resources:
       AttributeDefinitions:
         - AttributeName: idempotency_key
           AttributeType: S
+        - AttributeName: claim_id
+          AttributeType: S
+        - AttributeName: confirmed_at
+          AttributeType: S
+      # GSI lets the CMS Lambda look up decisions by claim_id (for GET /claims/{id})
+      GlobalSecondaryIndexes:
+        - IndexName: claim_id-index
+          KeySchema:
+            - AttributeName: claim_id
+              KeyType: HASH
+            - AttributeName: confirmed_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  # ===========================================================================
+  # S3 BUCKET — Policy document storage
+  #
+  # One bucket shared across all environments, prefixed by stage.
+  # Bedrock ingests the policy manual PDF from here.
+  # Versioning is enabled so ingestion history is preserved.
+  # ===========================================================================
+  PolicyDocsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub claimsense-docs-${AWS::AccountId}
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # ===========================================================================
+  # BEDROCK KNOWLEDGE BASE IAM ROLE
+  #
+  # Bedrock needs permission to read from S3 and call the embedding model.
+  # This role is assumed by the Knowledge Base service, not by Lambda.
+  # ===========================================================================
+  BedrockKnowledgeBaseRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub claimsense-bedrock-kb-role-${Stage}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3ReadForIngestion
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt PolicyDocsBucket.Arn
+                  - !Sub "${PolicyDocsBucket.Arn}/*"
+        - PolicyName: BedrockEmbeddingAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                Resource:
+                  # Amazon Titan Embeddings G1 — used to embed policy clauses
+                  - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v1"
+
+  # ===========================================================================
+  # BEDROCK KNOWLEDGE BASE
+  #
+  # Points at the S3 bucket. Bedrock ingests the policy manual PDF,
+  # chunks it by section, embeds each chunk with Titan Embeddings,
+  # and stores the vectors in a Bedrock-managed store.
+  #
+  # After first deploy, trigger ingestion manually:
+  #   aws bedrock-agent start-ingestion-job \
+  #     --knowledge-base-id <id> \
+  #     --data-source-id <id>
+  #
+  # Or add the policy PDF to S3 — Bedrock can be configured to auto-ingest.
+  # ===========================================================================
+  PolicyKnowledgeBase:
+    Type: AWS::Bedrock::KnowledgeBase
+    Properties:
+      Name: !Sub claimsense-policy-kb-${Stage}
+      Description: AutoSure policy manual — used by Coverage Check agent for clause retrieval
+      RoleArn: !GetAtt BedrockKnowledgeBaseRole.Arn
+      KnowledgeBaseConfiguration:
+        Type: VECTOR
+        VectorKnowledgeBaseConfiguration:
+          EmbeddingModelArn: !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v1"
+      StorageConfiguration:
+        # OPENSEARCH_SERVERLESS is the Bedrock-managed default.
+        # AWS provisions and manages the vector store — no setup needed.
+        Type: OPENSEARCH_SERVERLESS
+
+  PolicyKnowledgeBaseDataSource:
+    Type: AWS::Bedrock::DataSource
+    Properties:
+      Name: !Sub claimsense-policy-manual-${Stage}
+      KnowledgeBaseId: !Ref PolicyKnowledgeBase
+      DataSourceConfiguration:
+        Type: S3
+        S3Configuration:
+          BucketArn: !GetAtt PolicyDocsBucket.Arn
+          InclusionPrefixes:
+            - !Sub "${Stage}/policy-manual/"
 
 # ===========================================================================
 # OUTPUTS — values printed after `sam deploy`, referenced by the React app
@@ -272,3 +407,11 @@ Outputs:
   UserPoolClientId:
     Description: Cognito App Client ID (needed by React Amplify config)
     Value: !Ref AdjusterUserPoolClient
+
+  PolicyDocsBucketName:
+    Description: S3 bucket for policy manual PDFs
+    Value: !Ref PolicyDocsBucket
+
+  KnowledgeBaseId:
+    Description: Bedrock Knowledge Base ID (needed by env.local.json for local dev)
+    Value: !Ref PolicyKnowledgeBase

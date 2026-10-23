@@ -73,8 +73,7 @@ AdjustAI/
 │   │   ├── decision_draft.py          # Agent 4: verdict + reasoning chain
 │   │   └── pipeline.py                # Orchestrator: pre-checks then 4 agents
 │   ├── retrieval/
-│   │   ├── pdf_extract.py             # Extract AutoSure_Policy_Manual PDF → clause text
-│   │   └── bm25_index.py              # rank_bm25 index over extracted clauses
+│   │   └── bedrock_retrieval.py       # Bedrock Knowledge Base retrieve() wrapper
 │   ├── deterministic/
 │   │   └── checks.py                  # Liability-only deny, expired policy, total-loss ratio
 │   ├── seed/
@@ -169,7 +168,7 @@ Agent 4 — Decision Draft
 - [x] **Step 1** — `template.yaml` + `docker-compose.yml` (SAM + DynamoDB Local)
 - [x] **Step 2** — `src/seed/seed_dynamo.py` (CSVs → DynamoDB, idempotent)
 - [ ] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
-- [ ] **Step 4** — `src/retrieval/` — PDF extract + real BM25 index
+- [ ] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
 - [ ] **Step 5** — `src/deterministic/checks.py` — pre-agent deterministic checks
 - [ ] **Step 6** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
 - [ ] **Step 7** — `src/eval/` — 21-case eval suite + CI gate (92% threshold)
