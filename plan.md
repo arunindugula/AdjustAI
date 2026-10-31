@@ -170,7 +170,7 @@ Agent 4 — Decision Draft
 - [x] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
 - [x] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
 - [x] **Step 5** — `mcp-server/` — single MCP server exposing all 3 tool groups
-- [ ] **Step 6** — `src/deterministic/checks.py` — pre-agent deterministic checks
+- [x] **Step 6** — `src/deterministic/checks.py` — pre-agent deterministic checks
 - [ ] **Step 7** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
 - [ ] **Step 8** — `src/eval/` — 21-case eval suite + CI gate (92% threshold)
 - [ ] **Step 9** — `frontend/` — Vite scaffold + Cognito auth + all pages + components
