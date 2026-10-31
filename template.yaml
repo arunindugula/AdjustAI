@@ -217,6 +217,57 @@ Resources:
             Path: /documents/search
             Method: GET
 
+  # -------------------------------------------------------------------------
+  # MCP SERVER LAMBDA
+  #
+  # Single MCP server exposing CMS, PAS, and DocStore as tools.
+  # Uses Streamable HTTP transport (Mangum bridges Lambda <-> ASGI).
+  # Calls the other Lambdas via the same API Gateway URL.
+  #
+  # Routes:
+  #   POST   /mcp   — MCP tool calls
+  #   GET    /mcp   — MCP server info / SSE
+  #   DELETE /mcp   — session cleanup
+  # -------------------------------------------------------------------------
+  MCPServerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub claimsense-mcp-${Stage}
+      CodeUri: mcp-server/
+      Handler: server.lambda_handler
+      Description: MCP server — exposes CMS, PAS, and DocStore as MCP tools
+      Timeout: 30
+      Environment:
+        Variables:
+          # Points at the same API Gateway so MCP tools call real Lambda handlers
+          API_BASE_URL: !Sub "https://${ClaimSenseApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+          MCP_ADJUSTER_ID: mcp-agent
+      Events:
+        MCPPost:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClaimSenseApi
+            Path: /mcp
+            Method: POST
+            Auth:
+              Authorizer: NONE   # agents authenticate at the tool level via JWT
+        MCPGet:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClaimSenseApi
+            Path: /mcp
+            Method: GET
+            Auth:
+              Authorizer: NONE
+        MCPDelete:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClaimSenseApi
+            Path: /mcp
+            Method: DELETE
+            Auth:
+              Authorizer: NONE
+
   # ===========================================================================
   # DYNAMODB TABLES
   #
@@ -421,3 +472,7 @@ Outputs:
   KnowledgeBaseId:
     Description: Bedrock Knowledge Base ID (needed by env.local.json for local dev)
     Value: !Ref PolicyKnowledgeBase
+
+  MCPServerUrl:
+    Description: MCP server endpoint (Streamable HTTP)
+    Value: !Sub "https://${ClaimSenseApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/mcp"

@@ -10,7 +10,7 @@
 #   make logs ENV=staging      → tail Lambda logs from staging
 #   make destroy ENV=dev       → tear down a CloudFormation stack
 
-.PHONY: dev seed eval tables deploy logs destroy frontend stop clean ingest
+.PHONY: dev seed eval tables deploy logs destroy frontend stop clean ingest mcp
 
 # Default environment — override with ENV=staging or ENV=prod
 ENV ?= dev
@@ -52,6 +52,14 @@ tables:
 # Start the React dev server (run in a separate terminal alongside `make dev`).
 frontend:
 	cd frontend && npm run dev
+
+# Start the MCP server locally (stdio transport — for Claude Code integration).
+# Run this after `make dev` so the API is up on :3000.
+#
+#   make mcp                         → stdio (Claude Code)
+#   MCP_TRANSPORT=streamable-http make mcp  → HTTP on :8080
+mcp:
+	API_BASE_URL=http://localhost:3000 .venv/bin/python mcp-server/server.py
 
 # Upload policy manual to S3 and trigger Bedrock ingestion.
 # Run once after `sam deploy`, and again whenever the policy manual changes.
