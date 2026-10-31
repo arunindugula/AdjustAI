@@ -42,8 +42,12 @@ seed:
 
 # Run the 21-case evaluation suite.
 # Exits non-zero if accuracy < 92% — this is the CI gate signal.
+#
+#   make eval                         → full suite (requires OPENAI_API_KEY)
+#   make eval ARGS=--deterministic-only → only pre-check cases, no OpenAI calls
+#   make eval ARGS=EVAL-001           → single case by case_id
 eval:
-	.venv/bin/python src/eval/run_eval.py
+	.venv/bin/python src/eval/run_eval.py $(ARGS)
 
 # (Re)create DynamoDB Local tables without restarting everything.
 tables:
