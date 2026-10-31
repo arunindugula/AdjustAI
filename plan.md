@@ -171,7 +171,7 @@ Agent 4 — Decision Draft
 - [x] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
 - [x] **Step 5** — `mcp-server/` — single MCP server exposing all 3 tool groups
 - [x] **Step 6** — `src/deterministic/checks.py` — pre-agent deterministic checks
-- [ ] **Step 7** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
+- [x] **Step 7** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
 - [ ] **Step 8** — `src/eval/` — 21-case eval suite + CI gate (92% threshold)
 - [ ] **Step 9** — `frontend/` — Vite scaffold + Cognito auth + all pages + components
 - [ ] **Step 10** — `.github/workflows/ci.yml` — build → eval gate → push image
