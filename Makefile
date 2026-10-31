@@ -10,10 +10,14 @@
 #   make logs ENV=staging      → tail Lambda logs from staging
 #   make destroy ENV=dev       → tear down a CloudFormation stack
 
-.PHONY: dev seed eval tables deploy logs destroy frontend stop clean ingest mcp
+.PHONY: dev seed eval tables deploy logs destroy frontend stop clean ingest mcp cognito
 
 # Default environment — override with ENV=staging or ENV=prod
 ENV ?= dev
+
+# Load .env if it exists (secrets — gitignored)
+-include .env
+export
 
 # ---------------------------------------------------------------------------
 # LOCAL DEVELOPMENT
@@ -56,6 +60,14 @@ tables:
 # Start the React dev server (run in a separate terminal alongside `make dev`).
 frontend:
 	cd frontend && npm run dev
+
+# Seed Cognito user accounts (run once after `sam deploy`).
+# Requires USER_POOL_ID from stack outputs, or set ENV to look it up automatically.
+#
+#   make cognito                         → uses ENV=dev, looks up pool from CloudFormation
+#   USER_POOL_ID=us-east-1_XXX make cognito  → explicit pool ID
+cognito:
+	ENV=$(ENV) TEMP_PASSWORD=$(COGNITO_SEED_PASSWORD) .venv/bin/python src/seed/seed_cognito.py
 
 # Start the MCP server locally (stdio transport — for Claude Code integration).
 # Run this after `make dev` so the API is up on :3000.

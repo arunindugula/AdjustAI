@@ -69,6 +69,10 @@ Resources:
           AttributeDataType: String
           Mutable: true
           Required: false
+        - Name: adjuster_id
+          AttributeDataType: String
+          Mutable: true
+          Required: false
 
   AdjusterUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
