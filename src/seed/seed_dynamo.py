@@ -57,11 +57,69 @@ def get_dynamo_resource():
     kwargs = dict(region_name=REGION)
     if ENDPOINT:
         kwargs["endpoint_url"] = ENDPOINT
-        # DynamoDB Local requires non-empty credentials even though it
-        # doesn't validate them. These values are intentionally fake.
         kwargs["aws_access_key_id"]     = os.environ.get("AWS_ACCESS_KEY_ID", "local")
         kwargs["aws_secret_access_key"] = os.environ.get("AWS_SECRET_ACCESS_KEY", "local")
     return boto3.resource("dynamodb", **kwargs)
+
+
+def ensure_tables(dynamo):
+    """Create tables if they don't already exist (local dev only)."""
+    client = dynamo.meta.client
+    existing = set(client.list_tables()["TableNames"])
+
+    def _create(name, key_schema, attr_defs, gsi=None):
+        if name in existing:
+            return
+        kwargs = dict(
+            TableName=name,
+            BillingMode="PAY_PER_REQUEST",
+            KeySchema=key_schema,
+            AttributeDefinitions=attr_defs,
+        )
+        if gsi:
+            kwargs["GlobalSecondaryIndexes"] = gsi
+        client.create_table(**kwargs)
+        print(f"  Created {name}")
+
+    _create(
+        CLAIMS_TABLE,
+        key_schema=[{"AttributeName": "claim_id", "KeyType": "HASH"}],
+        attr_defs=[{"AttributeName": "claim_id", "AttributeType": "S"}],
+    )
+    _create(
+        POLICIES_TABLE,
+        key_schema=[{"AttributeName": "policy_id", "KeyType": "HASH"}],
+        attr_defs=[{"AttributeName": "policy_id", "AttributeType": "S"}],
+    )
+    _create(
+        DOCUMENTS_TABLE,
+        key_schema=[
+            {"AttributeName": "claim_id",    "KeyType": "HASH"},
+            {"AttributeName": "document_id", "KeyType": "RANGE"},
+        ],
+        attr_defs=[
+            {"AttributeName": "claim_id",    "AttributeType": "S"},
+            {"AttributeName": "document_id", "AttributeType": "S"},
+        ],
+    )
+    DECISIONS_TABLE = os.environ.get("DECISIONS_TABLE", "claimsense-decisions-dev")
+    _create(
+        DECISIONS_TABLE,
+        key_schema=[{"AttributeName": "idempotency_key", "KeyType": "HASH"}],
+        attr_defs=[
+            {"AttributeName": "idempotency_key", "AttributeType": "S"},
+            {"AttributeName": "claim_id",         "AttributeType": "S"},
+            {"AttributeName": "confirmed_at",     "AttributeType": "S"},
+        ],
+        gsi=[{
+            "IndexName": "claim_id-index",
+            "KeySchema": [
+                {"AttributeName": "claim_id",     "KeyType": "HASH"},
+                {"AttributeName": "confirmed_at", "KeyType": "RANGE"},
+            ],
+            "Projection": {"ProjectionType": "ALL"},
+        }],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -206,6 +264,9 @@ def seed_documents(table):
 def main():
     print(f"Connecting to DynamoDB at {ENDPOINT or 'AWS'} ...")
     dynamo = get_dynamo_resource()
+
+    print("Ensuring tables exist...")
+    ensure_tables(dynamo)
 
     print(f"\nSeeding {CLAIMS_TABLE} ...")
     n = seed_claims(dynamo.Table(CLAIMS_TABLE))

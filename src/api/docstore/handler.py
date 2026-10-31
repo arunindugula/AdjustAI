@@ -23,7 +23,7 @@ from decimal import Decimal
 
 import boto3
 
-from retrieval.bedrock_retrieval import retrieve
+from bedrock_retrieval import retrieve
 
 # ---------------------------------------------------------------------------
 # DynamoDB setup
@@ -93,21 +93,16 @@ def get_documents(claim_id: str) -> dict:
     )
     items = result.get("Items", [])
 
-    if not items:
-        return _error(404, f"No documents found for claim {claim_id}.")
-
-    # Summarise OCR status so the agent can see at a glance
-    # how many documents are ready vs still pending
     pending  = [d["document_id"] for d in items if d.get("ocr_status") == "Pending"]
     complete = [d["document_id"] for d in items if d.get("ocr_status") == "Completed"]
 
     return _response(200, {
-        "claim_id":          claim_id,
-        "total_documents":   len(items),
-        "ocr_complete":      len(complete),
-        "ocr_pending":       len(pending),
-        "pending_doc_ids":   pending,
-        "documents":         items,
+        "claim_id":        claim_id,
+        "total":           len(items),
+        "ocr_complete":    len(complete),
+        "ocr_pending":     len(pending),
+        "pending_doc_ids": pending,
+        "documents":       items,
     })
 
 
@@ -134,7 +129,7 @@ def get_documents(claim_id: str) -> dict:
 # statement. A verdict without a cited clause ID fails validation.
 # ---------------------------------------------------------------------------
 
-def search_policy_corpus(body: dict) -> dict:
+def search_policy_corpus(body: dict, claim_id: str = "") -> dict:
     query_text = body.get("query_text", "").strip()
     if not query_text:
         return _error(400, "query_text is required.")
@@ -162,21 +157,21 @@ def search_policy_corpus(body: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def lambda_handler(event: dict, context) -> dict:
-    method = event.get("httpMethod", "")
-    params = event.get("pathParameters") or {}
-    path   = event.get("path", "")
+    method       = event.get("httpMethod", "")
+    path         = event.get("path", "")
+    query_params = event.get("queryStringParameters") or {}
 
-    if method == "GET" and "claim_id" in params:
-        claim_id = params["claim_id"]
+    if method == "GET" and path.endswith("/search"):
+        claim_id = query_params.get("claim_id", "")
+        query    = query_params.get("q", "")
+        if not query:
+            return _error(400, "q parameter is required.")
+        return search_policy_corpus({"query_text": query}, claim_id=claim_id)
+
+    if method == "GET":
+        claim_id = query_params.get("claim_id", "")
         if not claim_id:
-            return _error(400, "Missing claim_id in path.")
+            return _error(400, "Missing claim_id query parameter.")
         return get_documents(claim_id)
-
-    if method == "POST" and path.endswith("/search"):
-        try:
-            body = json.loads(event.get("body") or "{}")
-        except json.JSONDecodeError:
-            return _error(400, "Request body is not valid JSON.")
-        return search_policy_corpus(body)
 
     return _error(405, f"Method {method} not allowed on path {path}.")

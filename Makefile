@@ -10,7 +10,7 @@
 #   make logs ENV=staging      → tail Lambda logs from staging
 #   make destroy ENV=dev       → tear down a CloudFormation stack
 
-.PHONY: dev seed eval tables deploy logs destroy frontend stop clean
+.PHONY: dev seed eval tables deploy logs destroy frontend stop clean ingest
 
 # Default environment — override with ENV=staging or ENV=prod
 ENV ?= dev
@@ -27,8 +27,6 @@ ENV ?= dev
 dev:
 	@echo "==> Starting DynamoDB Local..."
 	docker compose up -d
-	@echo "==> Waiting for tables..."
-	sleep 5
 	@echo "==> Seeding data..."
 	$(MAKE) seed
 	@echo "==> Starting SAM local API on http://localhost:3000"
@@ -40,12 +38,12 @@ dev:
 # Reload CSV data into DynamoDB Local at any time.
 # Also used after `docker compose down` wipes the in-memory tables.
 seed:
-	python src/seed/seed_dynamo.py
+	.venv/bin/python src/seed/seed_dynamo.py
 
 # Run the 21-case evaluation suite.
 # Exits non-zero if accuracy < 92% — this is the CI gate signal.
 eval:
-	python src/eval/run_eval.py
+	.venv/bin/python src/eval/run_eval.py
 
 # (Re)create DynamoDB Local tables without restarting everything.
 tables:
@@ -54,6 +52,18 @@ tables:
 # Start the React dev server (run in a separate terminal alongside `make dev`).
 frontend:
 	cd frontend && npm run dev
+
+# Upload policy manual to S3 and trigger Bedrock ingestion.
+# Run once after `sam deploy`, and again whenever the policy manual changes.
+# Get KNOWLEDGE_BASE_ID and DOCS_BUCKET from `sam deploy` outputs.
+#
+#   make ingest ENV=dev KNOWLEDGE_BASE_ID=<id> DOCS_BUCKET=<bucket>
+ingest:
+	@echo "==> Uploading policy manual and triggering Bedrock ingestion ($(ENV))..."
+	KNOWLEDGE_BASE_ID=$(KNOWLEDGE_BASE_ID) \
+	DOCS_BUCKET=$(DOCS_BUCKET) \
+	STAGE=$(ENV) \
+	.venv/bin/python src/retrieval/ingest.py
 
 # Stop running containers without removing them.
 stop:

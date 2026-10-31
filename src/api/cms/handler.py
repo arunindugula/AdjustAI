@@ -172,14 +172,38 @@ def post_decision(claim_id: str, body: dict, idempotency_key: str) -> dict:
 # parameters from it, then dispatch to the right handler.
 # ---------------------------------------------------------------------------
 
+def list_claims() -> dict:
+    """
+    Scan the claims table and return all claims.
+    Used by the dashboard to populate the claims list.
+    DynamoDB Scan is acceptable here — 20 claims, small table.
+    """
+    table  = _get_table(CLAIMS_TABLE)
+    result = table.scan()
+    items  = result.get("Items", [])
+
+    # Sort by created_at descending so newest claims appear first
+    items.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+
+    return _response(200, {
+        "total":  len(items),
+        "claims": items,
+    })
+
+
 def lambda_handler(event: dict, context) -> dict:
     method     = event.get("httpMethod", "")
     params     = event.get("pathParameters") or {}
     headers    = event.get("headers") or {}
+    path       = event.get("path", "")
     claim_id   = params.get("claim_id", "")
 
     # Adjuster identity comes from the verified Cognito JWT header
     adjuster_id = headers.get("X-Adjuster-Id") or headers.get("x-adjuster-id", "")
+
+    # GET /claims — list all claims (dashboard)
+    if method == "GET" and path.rstrip("/").endswith("/claims"):
+        return list_claims()
 
     if not claim_id:
         return _error(400, "Missing claim_id in path.")

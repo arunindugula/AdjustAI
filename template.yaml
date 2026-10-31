@@ -127,6 +127,12 @@ Resources:
         - DynamoDBCrudPolicy:            # write only for decisions table
             TableName: !Ref DecisionsTable
       Events:
+        ListClaims:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClaimSenseApi
+            Path: /claims
+            Method: GET
         GetClaim:
           Type: Api
           Properties:
@@ -202,14 +208,14 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ClaimSenseApi
-            Path: /documents/{claim_id}
+            Path: /documents
             Method: GET
         SearchCorpus:
           Type: Api
           Properties:
             RestApiId: !Ref ClaimSenseApi
-            Path: /search
-            Method: POST
+            Path: /documents/search
+            Method: GET
 
   # ===========================================================================
   # DYNAMODB TABLES

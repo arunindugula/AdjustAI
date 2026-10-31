@@ -168,12 +168,43 @@ Agent 4 — Decision Draft
 - [x] **Step 1** — `template.yaml` + `docker-compose.yml` (SAM + DynamoDB Local)
 - [x] **Step 2** — `src/seed/seed_dynamo.py` (CSVs → DynamoDB, idempotent)
 - [x] **Step 3** — Lambda handlers: `src/api/cms/`, `src/api/pas/`, `src/api/docstore/`
-- [ ] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
-- [ ] **Step 5** — `src/deterministic/checks.py` — pre-agent deterministic checks
-- [ ] **Step 6** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
-- [ ] **Step 7** — `src/eval/` — 21-case eval suite + CI gate (92% threshold)
-- [ ] **Step 8** — `frontend/` — Vite scaffold + Cognito auth + all pages + components
-- [ ] **Step 9** — `.github/workflows/ci.yml` — build → eval gate → push image
+- [x] **Step 4** — `src/retrieval/` — Bedrock Knowledge Base setup + policy manual upload to S3
+- [ ] **Step 5** — `mcp-server/` — single MCP server exposing all 3 tool groups
+- [ ] **Step 6** — `src/deterministic/checks.py` — pre-agent deterministic checks
+- [ ] **Step 7** — `src/agents/` — schemas + 4 agents + pipeline orchestrator
+- [ ] **Step 8** — `src/eval/` — 21-case eval suite + CI gate (92% threshold)
+- [ ] **Step 9** — `frontend/` — Vite scaffold + Cognito auth + all pages + components
+- [ ] **Step 10** — `.github/workflows/ci.yml` — build → eval gate → push image
+
+---
+
+## MCP Server (Step 5)
+
+One MCP server (`mcp-server/`) wraps all three Lambda APIs so Claude Code (and other MCP clients) can call them as tools directly.
+
+```
+mcp-server/
+  server.py          # FastMCP entrypoint — registers all tools, shared HTTP client + auth
+  tools/
+    cms.py           # get_claim, list_claims, post_decision
+    pas.py           # get_policy
+    docstore.py      # list_documents, search_documents
+  requirements.txt   # fastmcp, httpx
+```
+
+**Design decisions:**
+- Single server — all 3 tool groups share the same domain, auth, and base URL; no reason to split
+- Tools map 1:1 to existing API endpoints (no new logic lives here)
+- In local dev, base URL points to SAM local (`http://localhost:3000`); configurable via env var
+
+**Hosting: AWS Lambda via SAM (ADR-016)**
+- Deployed as a fourth SAM function + API Gateway route in `template.yaml` — same pipeline, zero new infra
+- Stateless, scales to zero, ~$0 at rest
+- MCP calls are short request/response (not long-lived streams), so cold starts are not a concern
+- Alternatives considered and rejected:
+  - Fargate/ECS — always-on cost (~$30-50/month), more ops overhead, no benefit here
+  - Fly.io/Railway — adds a non-AWS vendor to an otherwise AWS-only stack
+  - Local only — dev convenience, not a real deployment
 
 ---
 
